@@ -1,6 +1,6 @@
 import "./style.css";
 import { createRoot } from "react-dom/client";
-import { App } from "./components/hello";
+import { App } from "./components/App";
 
 const root = document.createElement("div");
 document.body.append(root);
