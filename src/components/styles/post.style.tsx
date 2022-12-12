@@ -46,3 +46,38 @@ export const PostCtnrInfoStyle = styled.div`
   color: var(--on-bg-color-700);
   font-size: 0.9rem;
 `;
+
+export const LeftBarStyle = styled.div`
+  background: linear-gradient(0deg, var(--bg-color), var(--bg-color-50));
+  border-right: 1px solid var(--bg-color-200);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px;
+`;
+
+export const CtnrVotesStyle = styled.div`
+  align-items: center;
+  display: flex;
+  color: var(--on-bg-color-600);
+  gap: 0.5rem;
+  writing-mode: vertical-lr;
+`;
+
+export const ScoreStyle = styled.div`
+  color: var(--secondary-color);
+  font-weight: bold;
+  white-space: nowrap;
+`;
+
+export const ControlsStyle = styled.menu`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+
+  & > li {
+    list-style-type: none;
+  }
+`;

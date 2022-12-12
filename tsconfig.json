@@ -11,5 +11,6 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "include": ["./src/**/*", "src/custom.d.ts"]
 }

@@ -10,6 +10,10 @@
   --bg-color-300: hsl(0, 0%, 70%);
   --on-bg-color: hsl(0, 0%, 5%);
   --on-bg-color-700: hsl(0, 0%, 20%);
+  --on-bg-color-700: hsl(0, 0%, 30%);
+
+  --primary-color: #007fff;
+  --secondary-color: orangered;
 }
 
 *,
@@ -28,6 +32,7 @@ body {
 }
 
 img,
-video {
+video,
+svg {
   display: block;
 }
