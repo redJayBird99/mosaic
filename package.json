@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "description": "popular reddit content",
   "private": true,
-  "sideEffects": false,
+  "sideEffects": [
+    "*.css"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "devServe": "webpack serve --open --config webpack.dev.js",

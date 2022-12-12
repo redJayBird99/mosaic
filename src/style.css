@@ -1,6 +1,15 @@
 :root {
-  font-size: 16px;
+  font-size: clamp(14px, 2vw, 16px);
   line-height: 1.4;
+
+  --bg-color: white;
+  --bg-color-50: hsl(0, 0%, 95%);
+  --bg-color-100: hsl(0, 0%, 90%);
+  --bg-color-200: hsl(0, 0%, 80%);
+  --bg-color-250: hsl(0, 0%, 75%);
+  --bg-color-300: hsl(0, 0%, 70%);
+  --on-bg-color: hsl(0, 0%, 5%);
+  --on-bg-color-700: hsl(0, 0%, 20%);
 }
 
 *,
@@ -10,9 +19,15 @@
 }
 
 body {
-  margin: 0;
+  background-color: var(--bg-color-100);
   font-family: "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
     "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+}
+
+img,
+video {
+  display: block;
 }
