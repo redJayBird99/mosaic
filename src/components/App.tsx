@@ -1,6 +1,7 @@
 import React from "react";
 import { Content, RedditContent } from "../reddit/reddit";
 import { Post } from "./post";
+import { SkeletonPost } from "./skeleton-post";
 import { CtnrPostsStyle } from "./styles/App.style";
 
 export class App extends React.PureComponent<any, { c: Content[] }> {
@@ -39,7 +40,14 @@ export class App extends React.PureComponent<any, { c: Content[] }> {
         },
         Array.from({ length: cols }, () => [] as JSX.Element[])
       )
-      .map((list, i) => <div key={i}>{list}</div>);
+      .map((list, i) => (
+        <div key={i}>
+          {list}
+          {Array.from({ length: 3 }, (_, i) => (
+            <SkeletonPost key={i} />
+          ))}
+        </div>
+      ));
   }
 
   render() {
