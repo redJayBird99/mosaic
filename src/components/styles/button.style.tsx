@@ -11,11 +11,12 @@ export const IconBtnStyle = styled.button`
   transition: all 0.3s linear;
 
   &:hover,
-  &:focus {
+  &:focus-visible {
     /* primary color with opacity */
     border: 1px solid hsla(210.11764705882354, 100%, 50%, 0.3);
-    box-shadow: 0 0 0 0.15rem hsla(210.11764705882354, 100%, 50%, 0.2);
+    box-shadow: 0 0 0 0.35rem hsla(210.11764705882354, 100%, 50%, 0.2);
     transform: scale(1.2);
     outline: 0;
+    filter: contrast(150%) brightness(80%);
   }
 `;

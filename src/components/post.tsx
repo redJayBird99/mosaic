@@ -3,7 +3,6 @@ import { Flag, Save, Share } from "./icons";
 import { IconBtnStyle } from "./styles/button.style";
 import {
   ControlsStyle,
-  CtnrMediaStyle,
   CtnrVotesStyle,
   ImgStyle,
   LeftBarStyle,
@@ -38,23 +37,32 @@ export function Post({ c }: { c: Content }) {
 
 /** get  video or image element from the given available content */
 function PostMediaContent(props: { video?: Media; images?: Media[] }) {
+  // we need to set it manually because of this bug https://stackoverflow.com/questions/14554908/imgs-max-height-not-respecting-parents-dimensions
+  const maxHeight = (h: number) => `${h > 500 ? 500 : h}px`;
+
   if (props.video) {
     return (
-      <CtnrMediaStyle>
+      <div>
         <VideoStyle
+          style={{ maxHeight: maxHeight(props.video.height) }}
           src={props.video.url}
           height={props.video.height}
           width={props.video.width}
           controls
         />
-      </CtnrMediaStyle>
+      </div>
     );
   } else if (props.images) {
     const image = getFittingImage(props.images);
     return (
-      <CtnrMediaStyle>
-        <ImgStyle src={image.url} height={image.height} width={image.width} />
-      </CtnrMediaStyle>
+      <div>
+        <ImgStyle
+          style={{ maxHeight: maxHeight(image.height) }}
+          src={image.url}
+          height={image.height}
+          width={image.width}
+        />
+      </div>
     );
   }
 
@@ -81,8 +89,8 @@ function PostLeftSide({ score, ratio }: { score: number; ratio: number }) {
   return (
     <LeftBarStyle>
       <CtnrVotesStyle>
-        <ScoreStyle>{arrow + sc}</ScoreStyle>
-        <div>{Math.round(ratio * 100)}%</div>
+        <ScoreStyle title="votes">{arrow + sc}</ScoreStyle>
+        <div title="vote ratio">{Math.round(ratio * 100)}%</div>
       </CtnrVotesStyle>
       <PostControls />
     </LeftBarStyle>
