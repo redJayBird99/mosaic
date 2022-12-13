@@ -72,7 +72,7 @@ function PostMediaContent(props: { video?: Media; images?: Media[] }) {
 /** temporary image selector  */
 function getFittingImage(images: Media[]): Media {
   const maxWidth = 600;
-  const maxHeight = 500;
+  const maxHeight = 600;
 
   for (let i = images.length - 1; i >= 0; i--) {
     if (images[i].height <= maxHeight && images[i].width <= maxWidth) {
