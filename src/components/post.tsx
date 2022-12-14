@@ -41,13 +41,15 @@ function PostMediaContent(props: { video?: Media; images?: Media[] }) {
   const maxHeight = (h: number) => `${h > 500 ? 500 : h}px`;
 
   if (props.video) {
+    // we use aspect ratio because height and width don't prevent the layout shift https://github.com/w3c/csswg-drafts/issues/7524
     return (
       <div>
         <VideoStyle
-          style={{ maxHeight: maxHeight(props.video.height) }}
+          style={{
+            maxHeight: maxHeight(props.video.height),
+            aspectRatio: `${props.video.width / props.video.height}`,
+          }}
           src={props.video.url}
-          height={props.video.height}
-          width={props.video.width}
           controls
         />
       </div>

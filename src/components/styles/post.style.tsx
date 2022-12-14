@@ -41,7 +41,6 @@ export const ImgStyle = styled.img`
   height: 100%;
   margin: auto;
   object-fit: contain;
-  width: auto;
   max-width: 100%;
 `;
 

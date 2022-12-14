@@ -50,7 +50,7 @@ export class RedditContent {
   constructor(public listing: string) {}
 
   /** get the at most the next 10 media content to show, from the reddit api */
-  async getBatch() {
+  async getBatch(): Promise<Content[]> {
     if (this.buff.length === 0) {
       const json = await redditGet(this.listing, 30, this.after, this.count);
       this.buff = json.data.children
