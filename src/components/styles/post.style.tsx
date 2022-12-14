@@ -36,11 +36,10 @@ export const VideoStyle = styled.video`
 `;
 
 export const ImgStyle = styled.img`
-  background-clip: padding-box;
-  border-radius: 8px;
-  height: 100%;
-  margin: auto;
+  height: auto;
   object-fit: contain;
+  margin: auto;
+  max-height: 600px;
   max-width: 100%;
 `;
 

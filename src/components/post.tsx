@@ -55,12 +55,12 @@ function PostMediaContent(props: { video?: Media; images?: Media[] }) {
       </div>
     );
   } else if (props.images) {
-    const image = getFittingImage(props.images);
+    const image = props.images[props.images.length - 1];
     return (
       <div>
         <ImgStyle
-          style={{ maxHeight: maxHeight(image.height) }}
-          src={image.url}
+          srcSet={getScrSet(props.images)}
+          sizes="(max-width: 43rem) 85vw, 39rem"
           height={image.height}
           width={image.width}
         />
@@ -71,18 +71,8 @@ function PostMediaContent(props: { video?: Media; images?: Media[] }) {
   return <div>sorry there isn't any content</div>;
 }
 
-/** temporary image selector  */
-function getFittingImage(images: Media[]): Media {
-  const maxWidth = 600;
-  const maxHeight = 600;
-
-  for (let i = images.length - 1; i >= 0; i--) {
-    if (images[i].height <= maxHeight && images[i].width <= maxWidth) {
-      return images[i];
-    }
-  }
-
-  return images[0];
+function getScrSet(images: Media[]) {
+  return images.map((img) => `${img.url} ${img.width}w`).join(", ");
 }
 
 function PostLeftSide({ score, ratio }: { score: number; ratio: number }) {
