@@ -2,15 +2,22 @@ import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { Content, RedditContent } from "../reddit/reddit";
 import { Post } from "./post";
 import { SkeletonPost } from "./skeleton-post";
-import { CtnrPostsStyle } from "./styles/App.style";
+import {
+  CtnrPostsStyle,
+  LoadingRingStyle,
+  LoadingWindowStyle,
+} from "./styles/App.style";
 
-export class App extends React.PureComponent<any, { c: Content[] }> {
+export class App extends React.PureComponent<
+  any,
+  { c: Content[]; loading: boolean }
+> {
   mq = window.matchMedia("(max-width: 75rem)");
   reddit = new RedditContent("best");
   // contains all the ids of the currently displaying content,
   // this is used to prevent a very few duplicate posts that could potentially happen
   showing = new Set<string>();
-  state = { c: [] };
+  state = { c: [], loading: true };
   i = 0;
 
   onIntersection = (entries: IntersectionObserverEntry[]) => {
@@ -48,6 +55,12 @@ export class App extends React.PureComponent<any, { c: Content[] }> {
       this.setState((state) => ({
         c: state.c.concat(free),
       }));
+
+      if (this.state.loading) {
+        // two options to remove the loading, one is o fire a load event or wait a little for every case
+        // for now the latter was picked
+        setTimeout(() => this.setState({ loading: false }), 200);
+      }
     }
   }
 
@@ -79,7 +92,10 @@ export class App extends React.PureComponent<any, { c: Content[] }> {
   render() {
     const cols = this.mq.matches ? 1 : 2;
     return (
-      <CtnrPostsStyle cols={cols}>{this.renderColumn(cols)}</CtnrPostsStyle>
+      <CtnrPostsStyle cols={cols}>
+        {this.state.loading && <LoadingWindow />}
+        {this.renderColumn(cols)}
+      </CtnrPostsStyle>
     );
   }
 }
@@ -100,4 +116,17 @@ function PostsTail({ obs }: { obs: IntersectionObserver }) {
   }, []);
 
   return <div ref={divRef}></div>;
+}
+
+function LoadingWindow() {
+  return (
+    <LoadingWindowStyle>
+      <LoadingRingStyle>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </LoadingRingStyle>
+    </LoadingWindowStyle>
+  );
 }
