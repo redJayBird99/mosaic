@@ -5,6 +5,7 @@ export type Media = {
   height: number;
 };
 export type Content = {
+  id: string;
   title: string;
   author: string;
   created: string;
@@ -50,8 +51,8 @@ export class RedditContent {
 
   constructor(public listing: string) {}
 
-  /** get the at most the next 10 media content to show, from the reddit api,
-   * multiple called while it is already fetching are ignore
+  /** get around the next 10 media content to show, from the reddit api (some duplicate is possible),
+   * multiple called while it is already fetching are ignore,
    */
   async getBatch(): Promise<Content[]> {
     if (!this.fetching && this.buff.length === 0) {
@@ -65,13 +66,14 @@ export class RedditContent {
       this.count += 30;
     }
 
-    return this.buff.splice(0, 10);
+    return this.buff.splice(0, this.buff.length <= 14 ? this.buff.length : 10);
   }
 }
 
 /** if the give data is an video or a image response converts it to Content */
 function toMediaContent(data: JsonRes): Content | undefined {
   const rst = {
+    id: data.id,
     title: data.title,
     author: data.author,
     created: data.created,

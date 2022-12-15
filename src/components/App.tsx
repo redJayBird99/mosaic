@@ -7,7 +7,11 @@ import { CtnrPostsStyle } from "./styles/App.style";
 export class App extends React.PureComponent<any, { c: Content[] }> {
   mq = window.matchMedia("(max-width: 75rem)");
   reddit = new RedditContent("best");
+  // contains all the ids of the currently displaying content,
+  // this is used to prevent a very few duplicate posts that could potentially happen
+  showing = new Set<string>();
   state = { c: [] };
+  i = 0;
 
   onIntersection = (entries: IntersectionObserverEntry[]) => {
     entries.forEach((e) => {
@@ -37,9 +41,14 @@ export class App extends React.PureComponent<any, { c: Content[] }> {
 
   async fetchContent() {
     const batch = await this.reddit.getBatch();
-    this.setState((state) => ({
-      c: state.c.concat(batch),
-    }));
+    const free = batch.filter((c) => !this.showing.has(c.id));
+    free.forEach((c) => this.showing.add(c.id));
+
+    if (free.length > 0) {
+      this.setState((state) => ({
+        c: state.c.concat(free),
+      }));
+    }
   }
 
   /** split the content in the given amount of containers */
