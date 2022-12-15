@@ -46,13 +46,18 @@ export class RedditContent {
   private buff = [];
   private count = 0;
   private after: undefined | string;
+  private fetching = false;
 
   constructor(public listing: string) {}
 
-  /** get the at most the next 10 media content to show, from the reddit api */
+  /** get the at most the next 10 media content to show, from the reddit api,
+   * multiple called while it is already fetching are ignore
+   */
   async getBatch(): Promise<Content[]> {
-    if (this.buff.length === 0) {
+    if (!this.fetching && this.buff.length === 0) {
+      this.fetching = true;
       const json = await redditGet(this.listing, 30, this.after, this.count);
+      this.fetching = false;
       this.buff = json.data.children
         .map((r: JsonRes) => toMediaContent(r.data))
         .filter((r: Content | undefined) => r);
@@ -84,7 +89,10 @@ function toMediaContent(data: JsonRes): Content | undefined {
         url: data?.media?.["reddit_video"]?.["fallback_url"],
       },
     } as Content;
-  } else if (data.preview?.enabled) {
+  } else if (
+    data.preview?.enabled &&
+    data.preview?.images[0]?.resolutions?.length > 0
+  ) {
     return { ...rst, images: data.preview.images[0].resolutions } as Content;
   }
 

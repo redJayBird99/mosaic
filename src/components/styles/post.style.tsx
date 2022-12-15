@@ -20,12 +20,14 @@ export const PostContentStyle = styled.div`
   flex-grow: 1;
   gap: 0.5rem;
   justify-content: space-between;
+  overflow: hidden;
   padding: 0.5rem;
 `;
 
 export const PostTitleStyle = styled.h2`
   font-weight: 400;
   margin: 0 0 0.5rem 0;
+  overflow-wrap: break-word;
   text-align: center;
 `;
 

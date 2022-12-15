@@ -38,7 +38,7 @@ export function Post({ c }: { c: Content }) {
 /** get  video or image element from the given available content */
 function PostMediaContent(props: { video?: Media; images?: Media[] }) {
   // we need to set it manually because of this bug https://stackoverflow.com/questions/14554908/imgs-max-height-not-respecting-parents-dimensions
-  const maxHeight = (h: number) => `${h > 500 ? 500 : h}px`;
+  const maxHeight = (h: number) => `${h > 600 ? 600 : h}px`;
 
   if (props.video) {
     // we use aspect ratio because height and width don't prevent the layout shift https://github.com/w3c/csswg-drafts/issues/7524
