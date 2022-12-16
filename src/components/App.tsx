@@ -29,7 +29,7 @@ export class App extends React.PureComponent<
   };
 
   intersectionObs = new IntersectionObserver(this.onIntersection, {
-    rootMargin: "900px",
+    rootMargin: "500px",
   });
 
   componentDidMount(): void {
@@ -92,10 +92,13 @@ export class App extends React.PureComponent<
   render() {
     const cols = this.mq.matches ? 1 : 2;
     return (
-      <CtnrPostsStyle cols={cols}>
-        {this.state.loading && <LoadingWindow />}
-        {this.renderColumn(cols)}
-      </CtnrPostsStyle>
+      <>
+        <CtnrPostsStyle cols={cols}>
+          {this.state.loading && <LoadingWindow />}
+          {this.renderColumn(cols)}
+        </CtnrPostsStyle>
+        <PostsTail obs={this.intersectionObs} />
+      </>
     );
   }
 }

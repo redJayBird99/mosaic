@@ -4,6 +4,8 @@ export type Media = {
   width: number;
   height: number;
 };
+/** the url is a MPEG-DASH url */
+export type MediaVideo = { hls_url: string; fallback_url: string } & Media;
 export type Content = {
   id: string;
   title: string;
@@ -12,7 +14,7 @@ export type Content = {
   score: number;
   subreddit: string;
   voteRatio: number;
-  video?: Media;
+  video?: MediaVideo;
   images?: Media[];
 };
 
@@ -88,7 +90,9 @@ function toMediaContent(data: JsonRes): Content | undefined {
       video: {
         height: data.media["reddit_video"].height,
         width: data?.media?.["reddit_video"]?.width,
-        url: data?.media?.["reddit_video"]?.["fallback_url"],
+        url: data?.media?.["reddit_video"]?.["dash_url"],
+        fallback_url: data?.media?.["reddit_video"]?.["fallback_url"],
+        hls_url: data?.media?.["reddit_video"]?.["hls_url"],
       },
     } as Content;
   } else if (
