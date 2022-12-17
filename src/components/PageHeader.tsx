@@ -11,21 +11,21 @@ import {
   PageHeaderStyle,
 } from "./styles/PageHeader.style";
 
-export function PageHeader() {
+export function PageHeader(props: { toggleNav: () => void }) {
   return (
     <PageHeaderStyle>
       <HeaderBarStyle>
-        <LeftBlock />
+        <LeftBlock toggleNav={props.toggleNav} />
         <AuthButtons />
       </HeaderBarStyle>
     </PageHeaderStyle>
   );
 }
 
-function LeftBlock() {
+function LeftBlock(props: { toggleNav: () => void }) {
   return (
     <LeftBlockStyle>
-      <IconBtnStyle>
+      <IconBtnStyle onClick={props.toggleNav}>
         <ThreeBars />
       </IconBtnStyle>
       <h1>Mosaic</h1>

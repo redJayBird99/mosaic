@@ -1,5 +1,7 @@
-import React, { useEffect, useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
+import { Outlet, Params, useParams } from "react-router-dom";
 import { Content, RedditContent } from "../reddit/reddit";
+import { NavBar } from "./nav-bar";
 import { PageHeader } from "./PageHeader";
 import { Post } from "./post";
 import { SkeletonPost } from "./skeleton-post";
@@ -9,26 +11,46 @@ import {
   LoadingWindowStyle,
 } from "./styles/App.style";
 
+export const mainRoutes = [
+  { path: ":listing", element: <WrapMain /> },
+  { path: "", element: <WrapMain />, index: true },
+];
+
 export function App() {
+  const [nav, setNav] = useState(false);
+  const toggleNav = () => setNav((nav) => !nav);
+
   return (
     <>
-      <PageHeader></PageHeader>
-      <Main></Main>
+      <PageHeader toggleNav={toggleNav}></PageHeader>
+      <NavBar open={nav} />
+      <Outlet />
     </>
   );
 }
 
+function WrapMain() {
+  const params = useParams();
+  return <Main key={params.listing || ""} params={params} />;
+}
+
 class Main extends React.PureComponent<
-  any,
+  { params: Readonly<Params<string>> },
   { c: Content[]; loading: boolean }
 > {
   mq = window.matchMedia("(max-width: 75rem)");
-  reddit = new RedditContent("best");
+  reddit: RedditContent;
   // contains all the ids of the currently displaying content,
   // this is used to prevent a very few duplicate posts that could potentially happen
   showing = new Set<string>();
   state = { c: [], loading: true };
   i = 0;
+
+  constructor(props: { params: Readonly<Params<string>> }) {
+    super(props);
+    console.log(props.params?.listing);
+    this.reddit = new RedditContent(props.params?.listing || "best");
+  }
 
   onIntersection = (entries: IntersectionObserverEntry[]) => {
     entries.forEach((e) => {
