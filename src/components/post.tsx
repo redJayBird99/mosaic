@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Content, Media, MediaVideo } from "../reddit/reddit";
 import { Flag, Save, Share } from "./icons";
-import { IconBtnStyle } from "./styles/button.style";
+import { IconBtnGlowStyle } from "./styles/button.style";
 import {
   ControlsStyle,
   CtnrVotesStyle,
@@ -125,19 +125,19 @@ function PostControls() {
   return (
     <ControlsStyle>
       <li>
-        <IconBtnStyle title="Share" aria-label="Share">
+        <IconBtnGlowStyle title="Share" aria-label="Share">
           <Share />
-        </IconBtnStyle>
+        </IconBtnGlowStyle>
       </li>
       <li>
-        <IconBtnStyle title="Save" aria-label="Save">
+        <IconBtnGlowStyle title="Save" aria-label="Save">
           <Save />
-        </IconBtnStyle>
+        </IconBtnGlowStyle>
       </li>
       <li>
-        <IconBtnStyle title="Report" aria-label="Report">
+        <IconBtnGlowStyle title="Report" aria-label="Report">
           <Flag />
-        </IconBtnStyle>
+        </IconBtnGlowStyle>
       </li>
     </ControlsStyle>
   );

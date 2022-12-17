@@ -42,7 +42,6 @@ export const ImgStyle = styled.img`
   object-fit: contain;
   margin: auto;
   max-height: 600px;
-  max-width: 100%;
 `;
 
 export const PostCtnrInfoStyle = styled.div`
@@ -55,6 +54,7 @@ export const LeftBarStyle = styled.div`
   border-right: 1px solid var(--bg-color-100);
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
   justify-content: space-between;
   padding: 6px;
 

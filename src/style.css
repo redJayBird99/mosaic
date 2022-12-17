@@ -12,8 +12,13 @@
   --on-bg-color-700: hsl(0, 0%, 20%);
   --on-bg-color-600: hsl(0, 0%, 30%);
 
-  --primary-color: #007fff;
+  --primary-color: hsl(210, 100%, 50%);
+  --primary-color-400: hsl(210, 100%, 60%);
+  --primary-color-600: hsl(210, 100%, 40%);
+  --primary-color-650: hsl(210, 100%, 35%);
   --secondary-color: orangered;
+
+  --header-height: 4rem;
 }
 
 *,
@@ -31,10 +36,19 @@ body {
   margin: 0;
 }
 
+input,
+button,
+select,
+textarea {
+  font: inherit;
+}
+
 img,
 video,
-svg {
+svg,
+picture {
   display: block;
+  max-width: 100%;
 }
 
 h1,

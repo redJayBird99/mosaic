@@ -6,6 +6,7 @@ export const CtnrPostsStyle = styled.main<{ cols: number }>`
   gap: 0.5rem;
   justify-content: center;
   margin: auto;
+  margin-top: 1rem;
   max-width: 88rem;
   min-height: 105vh;
   padding: 0px 0.5rem;

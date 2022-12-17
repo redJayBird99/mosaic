@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { Content, RedditContent } from "../reddit/reddit";
+import { PageHeader } from "./PageHeader";
 import { Post } from "./post";
 import { SkeletonPost } from "./skeleton-post";
 import {
@@ -8,7 +9,16 @@ import {
   LoadingWindowStyle,
 } from "./styles/App.style";
 
-export class App extends React.PureComponent<
+export function App() {
+  return (
+    <>
+      <PageHeader></PageHeader>
+      <Main></Main>
+    </>
+  );
+}
+
+class Main extends React.PureComponent<
   any,
   { c: Content[]; loading: boolean }
 > {

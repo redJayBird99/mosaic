@@ -48,3 +48,53 @@ export function Flag() {
     </SmallIconStyle>
   );
 }
+
+export function Search() {
+  <svg
+    aria-label="Search"
+    color="#8e8e8e"
+    fill="#8e8e8e"
+    height="14"
+    role="img"
+    viewBox="0 0 24 24"
+    width="14"
+  >
+    <path
+      d="M19 10.5A8.5 8.5 0 1 1 10.5 2a8.5 8.5 0 0 1 8.5 8.5Z"
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+    ></path>
+    <line
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      x1="16.511"
+      x2="22"
+      y1="16.511"
+      y2="22"
+    ></line>
+  </svg>;
+}
+
+export function ThreeBars() {
+  return (
+    <svg
+      width="26px"
+      height="26px"
+      viewBox="0 -4 26 26"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g transform="translate(-150 -54)">
+        <path
+          d="M175,64H155V62h20a1,1,0,0,1,0,2Zm0-8H155V54h20a1,1,0,0,1,0,2ZM150,71a.945.945,0,0,1,1-1h2v2h-2A.945.945,0,0,1,150,71Zm0-8a.945.945,0,0,1,1-1h2v2h-2A.945.945,0,0,1,150,63Zm0-8a.945.945,0,0,1,1-1h2v2h-2A.945.945,0,0,1,150,55Zm26,16a.945.945,0,0,1-1,1H155V70h20A.945.945,0,0,1,176,71Z"
+          fill="#444"
+        />
+      </g>
+    </svg>
+  );
+}
