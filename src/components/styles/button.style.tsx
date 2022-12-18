@@ -6,8 +6,16 @@ export const IconBtnStyle = styled.button`
   border-radius: 6px;
   display: inline-block;
   cursor: pointer;
-  padding: 0.1rem;
+  padding: 0.1rem 0.2rem;
   text-align: center;
+  transition: all 0.3s linear;
+
+  &:focus-visible {
+    /* primary color with opacity */
+    border: 1px solid hsla(210.11764705882354, 100%, 50%, 0.3);
+    box-shadow: 0 0 0 0.15rem hsla(210.11764705882354, 100%, 50%, 0.2);
+    outline: 0;
+  }
 `;
 
 export const IconBtnGlowStyle = styled(IconBtnStyle)`

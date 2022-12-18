@@ -6,6 +6,14 @@ const SmallIconStyle = styled.svg`
   height: 1rem;
 `;
 
+const IconHoverStyle = styled.svg`
+  &:hover > *,
+  &:focus-visible {
+    filter: invert(34%) sepia(89%) saturate(3218%) hue-rotate(197deg)
+      brightness(103%) contrast(104%);
+  }
+`;
+
 export function Save() {
   return (
     <SmallIconStyle xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -83,7 +91,7 @@ export function Search() {
 
 export function ThreeBars() {
   return (
-    <svg
+    <IconHoverStyle
       width="26px"
       height="26px"
       viewBox="0 -4 26 26"
@@ -95,6 +103,6 @@ export function ThreeBars() {
           fill="#444"
         />
       </g>
-    </svg>
+    </IconHoverStyle>
   );
 }

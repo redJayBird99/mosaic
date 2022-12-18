@@ -21,12 +21,13 @@ export const NavBarStyle = styled.nav<{ open: boolean }>`
 `;
 
 export const LiStyle = styled.li`
+  border-bottom: 1px solid var(--bg-color-50);
   list-style-type: none;
   text-transform: capitalize;
   transition: background-color 0.2s linear;
 
   &:hover {
-    background-color: var(--bg-color-100);
+    background-color: var(--bg-color-50);
   }
 `;
 

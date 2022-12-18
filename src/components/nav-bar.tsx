@@ -14,7 +14,7 @@ export function NavBar(props: { open: boolean }) {
           <NavLink to="new" />
         </LiStyle>
         <LiStyle>
-          <NavLink to="random" />
+          <NavLink to="controversial" />
         </LiStyle>
         <LiStyle>
           <NavLink to="rising" />
