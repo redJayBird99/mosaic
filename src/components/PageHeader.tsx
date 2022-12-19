@@ -1,3 +1,5 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { ThreeBars } from "./icons";
 import {
   IconBtnStyle,
@@ -16,9 +18,28 @@ export function PageHeader(props: { toggleNav: () => void }) {
     <PageHeaderStyle>
       <HeaderBarStyle>
         <LeftBlock toggleNav={props.toggleNav} />
+        <Search />
         <AuthButtons />
       </HeaderBarStyle>
     </PageHeaderStyle>
+  );
+}
+
+function Search() {
+  const navigate = useNavigate();
+  const onSummit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const q = (e.currentTarget as HTMLFormElement).search.value;
+
+    if (q) {
+      navigate(`/search?q=${q}`);
+    }
+  };
+
+  return (
+    <form onSubmit={onSummit}>
+      <input name="search" type="search" placeholder="Search" />
+    </form>
   );
 }
 

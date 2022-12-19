@@ -1,6 +1,11 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { Outlet, Params, useParams } from "react-router-dom";
-import { Content, RedditContent } from "../reddit/reddit";
+import {
+  Content,
+  listingContent,
+  ContentBatch,
+  searchContent,
+} from "../reddit/reddit";
 import { NavBar } from "./nav-bar";
 import { PageHeader } from "./PageHeader";
 import { Post } from "./post";
@@ -12,8 +17,9 @@ import {
 } from "./styles/App.style";
 
 export const mainRoutes = [
-  { path: ":listing", element: <WrapMain /> },
-  { path: "", element: <WrapMain />, index: true },
+  { path: ":listing", element: <WrapListing /> },
+  { path: "search", element: <WrapSearch /> },
+  { path: "", element: <WrapListing />, index: true },
 ];
 
 export function App() {
@@ -29,28 +35,30 @@ export function App() {
   );
 }
 
-function WrapMain() {
+function WrapSearch() {
+  const q = new URLSearchParams(location.search).get("q");
+  console.log(q);
+  const reddit = searchContent(q || "");
+  return <Main key={q || ""} reddit={reddit} />;
+}
+
+function WrapListing() {
   const params = useParams();
-  return <Main key={params.listing || ""} params={params} />;
+  console.log(params);
+  const reddit = listingContent(params?.listing || "best");
+  return <Main key={params.listing || ""} reddit={reddit} />;
 }
 
 class Main extends React.PureComponent<
-  { params: Readonly<Params<string>> },
+  { reddit: ContentBatch },
   { c: Content[]; loading: boolean }
 > {
   mq = window.matchMedia("(max-width: 75rem)");
-  reddit: RedditContent;
   // contains all the ids of the currently displaying content,
   // this is used to prevent a very few duplicate posts that could potentially happen
   showing = new Set<string>();
   state = { c: [], loading: true };
   i = 0;
-
-  constructor(props: { params: Readonly<Params<string>> }) {
-    super(props);
-    console.log(props.params?.listing);
-    this.reddit = new RedditContent(props.params?.listing || "best");
-  }
 
   onIntersection = (entries: IntersectionObserverEntry[]) => {
     entries.forEach((e) => {
@@ -79,7 +87,7 @@ class Main extends React.PureComponent<
   }
 
   async fetchContent() {
-    const batch = await this.reddit.getBatch();
+    const batch = await this.props.reddit.getBatch();
     const free = batch.filter((c) => !this.showing.has(c.id));
     free.forEach((c) => this.showing.add(c.id));
 
