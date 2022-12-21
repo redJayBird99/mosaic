@@ -6,6 +6,11 @@ const SmallIconStyle = styled.svg`
   height: 1rem;
 `;
 
+const SearchIconStyle = styled(SmallIconStyle)`
+  align-self: center;
+  margin-right: 0.5rem;
+`;
+
 const IconHoverStyle = styled.svg`
   &:hover > *,
   &:focus-visible {
@@ -58,35 +63,37 @@ export function Flag() {
 }
 
 export function Search() {
-  <svg
-    aria-label="Search"
-    color="#8e8e8e"
-    fill="#8e8e8e"
-    height="14"
-    role="img"
-    viewBox="0 0 24 24"
-    width="14"
-  >
-    <path
-      d="M19 10.5A8.5 8.5 0 1 1 10.5 2a8.5 8.5 0 0 1 8.5 8.5Z"
-      fill="none"
-      stroke="currentColor"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-    ></path>
-    <line
-      fill="none"
-      stroke="currentColor"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      x1="16.511"
-      x2="22"
-      y1="16.511"
-      y2="22"
-    ></line>
-  </svg>;
+  return (
+    <SearchIconStyle
+      aria-label="Search"
+      color="#6e6e6e"
+      fill="##6e6e6e"
+      height="14"
+      role="img"
+      viewBox="0 0 24 24"
+      width="14"
+    >
+      <path
+        d="M19 10.5A8.5 8.5 0 1 1 10.5 2a8.5 8.5 0 0 1 8.5 8.5Z"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+      ></path>
+      <line
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        x1="16.511"
+        x2="22"
+        y1="16.511"
+        y2="22"
+      ></line>
+    </SearchIconStyle>
+  );
 }
 
 export function ThreeBars() {

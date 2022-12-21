@@ -12,7 +12,7 @@ export const CtnrPostsStyle = styled.main<{ cols: number }>`
   padding: 0px 0.5rem;
   position: relative;
 
-  & > * > * {
+  & > * > .post {
     margin-bottom: 0.5rem;
   }
 `;
@@ -65,5 +65,15 @@ export const LoadingRingStyle = styled.div`
   }
   & > div:nth-child(3) {
     animation-delay: -0.15s;
+  }
+`;
+
+export const QueryCtnrStyle = styled.div`
+  display: flex;
+  gap: 0.3rem;
+  grid-column: 1 / -1;
+
+  & > * {
+    width: 8rem;
   }
 `;

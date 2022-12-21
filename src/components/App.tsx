@@ -13,6 +13,8 @@ import {
 import { NavBar } from "./nav-bar";
 import { PageHeader } from "./PageHeader";
 import { PostsContainer } from "./Posts-container";
+import { QueryCtnrStyle } from "./styles/App.style";
+import { SelectStyle } from "./styles/form.style";
 
 export const mainRoutes = [
   { path: ":listing", element: <Listing /> },
@@ -50,28 +52,37 @@ function Search() {
     };
   }
 
+  const Controls = (
+    <QueryCtnrStyle>
+      <SelectStyle
+        onChange={onChange("sort")}
+        value={q.sort ?? ""}
+        form="search"
+      >
+        <option value="">Sort</option>
+        {sortOptions.map((e) => (
+          <option value={e} key={e}>
+            {e}
+          </option>
+        ))}
+      </SelectStyle>
+      <SelectStyle onChange={onChange("t")} value={q.t ?? ""} form="search">
+        <option value="">Time</option>
+        {timeOptions.map((e) => (
+          <option value={e} key={e}>
+            {e}
+          </option>
+        ))}
+      </SelectStyle>
+    </QueryCtnrStyle>
+  );
+
   return (
-    <>
-      <div>
-        <select onChange={onChange("sort")} value={q.sort ?? ""} form="search">
-          <option value="">Sort</option>
-          {sortOptions.map((e) => (
-            <option value={e} key={e}>
-              {e}
-            </option>
-          ))}
-        </select>
-        <select onChange={onChange("t")} value={q.t ?? ""} form="search">
-          <option value="">Time</option>
-          {timeOptions.map((e) => (
-            <option value={e} key={e}>
-              {e}
-            </option>
-          ))}
-        </select>
-      </div>
-      <Posts key={`${q.q}${q.sort}${q.t}`} reddit={searchContent(q)} />
-    </>
+    <Posts
+      key={`${q.q}${q.sort}${q.t}`}
+      reddit={searchContent(q)}
+      Controls={Controls}
+    />
   );
 }
 
@@ -82,12 +93,12 @@ function Listing() {
 }
 
 /** render the posts from the given content fetcher */
-function Posts({ reddit }: { reddit: ContentBatch }) {
+function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
   const [content, setContent] = useState<Content[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   async function fetchContent() {
-    const batch = await reddit.getBatch();
+    const batch = await props.reddit.getBatch();
 
     if (batch.length > 0) {
       setContent((content) => content.concat(batch));
@@ -117,5 +128,12 @@ function Posts({ reddit }: { reddit: ContentBatch }) {
     fetchContent();
   }, []);
 
-  return <PostsContainer c={content} obs={obsRef.current} loading={loading} />;
+  return (
+    <PostsContainer
+      c={content}
+      obs={obsRef.current}
+      loading={loading}
+      Controls={props.Controls}
+    />
+  );
 }

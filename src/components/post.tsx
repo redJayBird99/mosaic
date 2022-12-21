@@ -19,7 +19,7 @@ import dashjs from "dashjs";
 /** container for a listing reddit post, render the post content, infos and user post controls */
 export function Post({ c }: { c: Content }) {
   return (
-    <PostStyle>
+    <PostStyle className="post">
       <PostLeftSide score={c.score} ratio={c.voteRatio} />
       <PostContentStyle>
         <PostTitleStyle>{c.title}</PostTitleStyle>

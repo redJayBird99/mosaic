@@ -9,7 +9,12 @@ import {
 } from "./styles/App.style";
 
 export class PostsContainer extends React.PureComponent<
-  { c: Content[]; obs: IntersectionObserver; loading: boolean },
+  {
+    c: Content[];
+    obs: IntersectionObserver;
+    loading: boolean;
+    Controls?: JSX.Element;
+  },
   {}
 > {
   mq = window.matchMedia("(max-width: 75rem)");
@@ -55,6 +60,7 @@ export class PostsContainer extends React.PureComponent<
     const cols = this.mq.matches ? 1 : 2;
     return (
       <CtnrPostsStyle cols={cols}>
+        {this.props.Controls}
         {this.props.loading && <LoadingWindow />}
         {this.renderColumn(cols)}
       </CtnrPostsStyle>

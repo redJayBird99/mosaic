@@ -12,6 +12,8 @@ import {
   LeftBlockStyle,
   PageHeaderStyle,
 } from "./styles/PageHeader.style";
+import { Search as SearchIcon } from "./icons";
+import { InputGroupControlStyle, InputGroupStyle } from "./styles/form.style";
 
 export function PageHeader(props: { toggleNav: () => void }) {
   return (
@@ -45,7 +47,14 @@ function Search() {
 
   return (
     <form onSubmit={onSummit} id="search">
-      <input name="search" type="search" placeholder="Search" />
+      <InputGroupStyle>
+        <SearchIcon />
+        <InputGroupControlStyle
+          name="search"
+          type="search"
+          placeholder="Search"
+        />
+      </InputGroupStyle>
     </form>
   );
 }
