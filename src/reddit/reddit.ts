@@ -48,17 +48,35 @@ async function getListing(listing: string, p: RedditPosition) {
   );
 }
 
+export const sortOptions = ["relevance", "hot", "top", "new"];
+export const timeOptions = ["hour", "day", "week", "month", "year", "all"];
+export type Query = {
+  q: string | null;
+  sort: string | null;
+  t: string | null; // time
+};
+
 /** search for posts on the reddit api for the given q */
-async function search(q: string, p: RedditPosition) {
+async function search(q: Query, p: RedditPosition) {
   return await redditFetch(
-    `https://www.reddit.com/search.json?raw_json=1&limit=${p.limit}&q=${q}${
+    `https://www.reddit.com/search.json?raw_json=1&limit=${p.limit}&q=${q.q}${
       p.after ? `&after=${p.after}` : ""
-    }${p.count ? `&count=${p.count}` : ""}`
+    }${p.count ? `&count=${p.count}` : ""}${q.sort ? `&sort=${q.sort}` : ""}${
+      q.t ? `&t=${q.t}` : ""
+    }`
   );
 }
 
-//@ts-ignore
-window.redditSearch = search;
+/** only values with a valid string are returned */
+export function serializeQuery(q: Query): { [key: string]: string } {
+  const rst: { [key: string]: string } = {};
+
+  for (const [key, value] of Object.entries(q)) {
+    value && (rst[key] = value);
+  }
+
+  return rst;
+}
 
 /** an interface to fetch and consume content from the reddit api */
 export class ContentBatch {
@@ -100,7 +118,7 @@ export function listingContent(listing: string): ContentBatch {
 }
 
 /** get and store content from the given reddit listing */
-export function searchContent(q: string): ContentBatch {
+export function searchContent(q: Query): ContentBatch {
   return new ContentBatch((p: RedditPosition) => search(q, p));
 }
 

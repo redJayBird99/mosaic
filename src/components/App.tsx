@@ -1,10 +1,14 @@
-import { useEffect, useRef, useState } from "react";
-import { Outlet, useParams } from "react-router-dom";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { Outlet, useParams, useSearchParams } from "react-router-dom";
 import {
   Content,
   listingContent,
   ContentBatch,
   searchContent,
+  sortOptions,
+  timeOptions,
+  Query,
+  serializeQuery,
 } from "../reddit/reddit";
 import { NavBar } from "./nav-bar";
 import { PageHeader } from "./PageHeader";
@@ -30,9 +34,45 @@ export function App() {
 }
 
 function Search() {
-  const q = new URLSearchParams(location.search).get("q");
-  const redditRef = useRef(searchContent(q || ""));
-  return <Posts key={q || ""} reddit={redditRef.current} />;
+  let [searchPms, setSearchPms] = useSearchParams();
+  const q = {
+    q: searchPms.get("q"),
+    sort: searchPms.get("sort"),
+    t: searchPms.get("t"),
+  };
+
+  function onChange(
+    key: keyof Query
+  ): (e: ChangeEvent<HTMLSelectElement>) => void {
+    return (e) => {
+      q[key] = e.target.value;
+      setSearchPms(serializeQuery(q));
+    };
+  }
+
+  return (
+    <>
+      <div>
+        <select onChange={onChange("sort")} value={q.sort ?? ""} form="search">
+          <option value="">Sort</option>
+          {sortOptions.map((e) => (
+            <option value={e} key={e}>
+              {e}
+            </option>
+          ))}
+        </select>
+        <select onChange={onChange("t")} value={q.t ?? ""} form="search">
+          <option value="">Time</option>
+          {timeOptions.map((e) => (
+            <option value={e} key={e}>
+              {e}
+            </option>
+          ))}
+        </select>
+      </div>
+      <Posts key={`${q.q}${q.sort}${q.t}`} reddit={searchContent(q)} />
+    </>
+  );
 }
 
 function Listing() {

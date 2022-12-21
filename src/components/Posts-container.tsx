@@ -35,7 +35,7 @@ export class PostsContainer extends React.PureComponent<
     return this.props.c
       .reduce(
         (a, c, i) => {
-          a[i % cols].push(<Post key={i} c={c} />);
+          a[i % cols].push(<Post key={c.id} c={c} />);
           return a;
         },
         Array.from({ length: cols }, () => [] as JSX.Element[])

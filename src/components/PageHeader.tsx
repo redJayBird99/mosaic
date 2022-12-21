@@ -29,15 +29,22 @@ function Search() {
   const navigate = useNavigate();
   const onSummit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const q = (e.currentTarget as HTMLFormElement).search.value;
+    const form = e.currentTarget as HTMLFormElement;
+    const q = form.search.value;
+    const sort = form.sort?.value;
+    const time = form.time?.value;
 
     if (q) {
-      navigate(`/search?q=${q}`);
+      navigate(
+        `/search?q=${q}${sort ? `&sort=${sort}` : ""}${
+          time ? `&sort=${time}` : ""
+        }`
+      );
     }
   };
 
   return (
-    <form onSubmit={onSummit}>
+    <form onSubmit={onSummit} id="search">
       <input name="search" type="search" placeholder="Search" />
     </form>
   );
