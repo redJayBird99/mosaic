@@ -12,6 +12,7 @@ import {
 } from "../reddit/reddit";
 import { NavBar } from "./nav-bar";
 import { PageHeader } from "./PageHeader";
+import { NotFound } from "./post";
 import { PostsContainer } from "./Posts-container";
 import { QueryCtnrStyle } from "./styles/App.style";
 import { SelectStyle } from "./styles/form.style";
@@ -35,6 +36,8 @@ export function App() {
   );
 }
 
+type HandleChange = (e: ChangeEvent<HTMLSelectElement>) => void;
+
 function Search() {
   let [searchPms, setSearchPms] = useSearchParams();
   const q = {
@@ -43,16 +46,24 @@ function Search() {
     t: searchPms.get("t"),
   };
 
-  function onChange(
-    key: keyof Query
-  ): (e: ChangeEvent<HTMLSelectElement>) => void {
+  function onChange(key: keyof Query): HandleChange {
     return (e) => {
       q[key] = e.target.value;
       setSearchPms(serializeQuery(q));
     };
   }
 
-  const Controls = (
+  return (
+    <Posts
+      key={`${q.q}${q.sort}${q.t}`}
+      reddit={searchContent(q)}
+      Controls={SearchControls(q, onChange)}
+    />
+  );
+}
+
+function SearchControls(q: Query, onChange: (k: keyof Query) => HandleChange) {
+  return (
     <QueryCtnrStyle>
       <SelectStyle
         onChange={onChange("sort")}
@@ -76,14 +87,6 @@ function Search() {
       </SelectStyle>
     </QueryCtnrStyle>
   );
-
-  return (
-    <Posts
-      key={`${q.q}${q.sort}${q.t}`}
-      reddit={searchContent(q)}
-      Controls={Controls}
-    />
-  );
 }
 
 function Listing() {
@@ -92,16 +95,20 @@ function Listing() {
   return <Posts key={listing} reddit={redditRef.current} />;
 }
 
-/** render the posts from the given content fetcher */
+/** render the posts from the given content fetcher, or a not fund one */
 function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
-  const [content, setContent] = useState<Content[]>([]);
+  // if the content is null nothing was found
+  const [content, setContent] = useState<Content[] | null>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   async function fetchContent() {
     const batch = await props.reddit.getBatch();
 
-    if (batch.length > 0) {
-      setContent((content) => content.concat(batch));
+    if (batch === null) {
+      setContent(null);
+      setLoading(false);
+    } else if (batch.length > 0) {
+      setContent((content) => content!.concat(batch));
 
       if (loading) {
         // two options to remove the loading, one is o fire a load event or wait a little for every case
@@ -128,12 +135,16 @@ function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
     fetchContent();
   }, []);
 
-  return (
-    <PostsContainer
-      c={content}
-      obs={obsRef.current}
-      loading={loading}
-      Controls={props.Controls}
-    />
-  );
+  if (content) {
+    return (
+      <PostsContainer
+        c={content!}
+        obs={obsRef.current}
+        loading={loading}
+        Controls={props.Controls}
+      />
+    );
+  } else {
+    return <NotFound term={props.reddit.q} />;
+  }
 }

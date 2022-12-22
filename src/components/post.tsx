@@ -7,6 +7,7 @@ import {
   CtnrVotesStyle,
   ImgStyle,
   LeftBarStyle,
+  NotFoundStyle,
   PostAnchorStyle,
   PostContentStyle,
   PostCtnrInfoStyle,
@@ -17,6 +18,7 @@ import {
 } from "./styles/post.style";
 import dashjs from "dashjs";
 import { timeSince } from "../util/util";
+import mGlass from "../asset/magnifying-glass.png";
 
 /** container for a listing reddit post, render the post content, infos and user post controls */
 export function Post({ c }: { c: Content }) {
@@ -146,5 +148,14 @@ function PostControls() {
         </IconBtnGlowStyle>
       </li>
     </ControlsStyle>
+  );
+}
+
+export function NotFound({ term }: { term: string }) {
+  return (
+    <NotFoundStyle>
+      <img src={mGlass} alt="magnifying glass" height="256" width="256" />
+      <h3>{`Sorry, we couldn't find any results for "${term}"`}</h3>
+    </NotFoundStyle>
   );
 }

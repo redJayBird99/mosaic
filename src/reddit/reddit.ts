@@ -87,12 +87,16 @@ export class ContentBatch {
   private fetching = false;
 
   /** the fetcher is responsible for the specific reddit api request, while this class keep track of position */
-  constructor(private fetcher: (p: RedditPosition) => Promise<JsonRes>) {}
+  constructor(
+    private fetcher: (p: RedditPosition) => Promise<JsonRes>,
+    public q: string
+  ) {}
 
   /** get around the next 10 media content to show, from the reddit api (some duplicate is possible),
    * multiple called while it is already fetching are ignore,
+   * @Returns an array if it was able to find some posts otherwise null
    */
-  async getBatch(): Promise<Content[]> {
+  async getBatch(): Promise<Content[] | null> {
     if (!this.fetching && this.buff.length === 0) {
       this.fetching = true;
       const json = await this.fetcher({
@@ -100,8 +104,13 @@ export class ContentBatch {
         count: this.count,
         after: this.after,
       });
-      // const json = await redditGet(this.listing, 30, this.after, this.count);
       this.fetching = false;
+
+      console.log(json.data);
+      if (json.data.dist === 0) {
+        return null;
+      }
+
       this.buff = json.data.children
         .map((r: JsonRes) => toMediaContent(r.data))
         .filter((r: Content | undefined) => r);
@@ -115,12 +124,15 @@ export class ContentBatch {
 
 /** get and store content from the given reddit listing */
 export function listingContent(listing: string): ContentBatch {
-  return new ContentBatch((p: RedditPosition) => getListing(listing, p));
+  return new ContentBatch(
+    (p: RedditPosition) => getListing(listing, p),
+    listing
+  );
 }
 
 /** get and store content from the given reddit listing */
 export function searchContent(q: Query): ContentBatch {
-  return new ContentBatch((p: RedditPosition) => search(q, p));
+  return new ContentBatch((p: RedditPosition) => search(q, p), q.q ?? "");
 }
 
 /** if the give data is an video or a image response converts it to Content */

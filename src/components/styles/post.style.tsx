@@ -107,3 +107,13 @@ export const ControlsStyle = styled.menu`
     flex-direction: row;
   }
 `;
+
+export const NotFoundStyle = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  justify-content: center;
+  min-height: calc(100vh - var(--header-height));
+  text-align: center;
+`;

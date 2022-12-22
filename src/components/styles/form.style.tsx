@@ -32,7 +32,7 @@ export const SelectStyle = styled.select`
   background-repeat: no-repeat;
   background-size: 16px 12px;
   border: 1px solid var(--bg-color-200);
-  border-radius: 0.375rem;
+  border-radius: 14px;
   color: var(--on-bg-color);
   display: block;
   padding: 0.375rem 2.25rem 0.375rem 0.75rem;
