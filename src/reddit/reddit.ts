@@ -15,10 +15,11 @@ export type Content = {
   id: string;
   title: string;
   author: string;
-  created: string;
+  created: number;
   score: number;
   subreddit: string;
   voteRatio: number;
+  link: string;
   video?: MediaVideo;
   images?: Media[];
 };
@@ -128,10 +129,11 @@ function toMediaContent(data: JsonRes): Content | undefined {
     id: data.id,
     title: data.title,
     author: data.author,
-    created: data.created,
+    created: data.created_utc * 1000, // it is in seconds
     score: data.score,
     subreddit: data.subreddit,
     voteRatio: data.upvote_ratio,
+    link: "https://www.reddit.com" + data.permalink,
   };
 
   if (data.is_video) {

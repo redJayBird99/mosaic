@@ -18,14 +18,21 @@ export const PostContentStyle = styled.div`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  gap: 0.5rem;
+  gap: 5px;
   justify-content: space-between;
   overflow: hidden;
-  padding: 0.5rem;
+  padding: 5px 0;
+`;
+
+export const PostAnchorStyle = styled.a`
+  color: var(--on-bg-color);
+  padding: 0 0.3rem;
+  text-decoration: none;
 `;
 
 export const PostTitleStyle = styled.h2`
   font-weight: 400;
+  font-size: 1.3rem;
   margin: 0 0 0.5rem 0;
   overflow-wrap: break-word;
   text-align: center;
@@ -46,7 +53,8 @@ export const ImgStyle = styled.img`
 
 export const PostCtnrInfoStyle = styled.div`
   color: var(--on-bg-color-600);
-  font-size: 0.9rem;
+  font-size: 0.825rem;
+  padding: 0 0.5rem;
 `;
 
 export const LeftBarStyle = styled.div`
@@ -56,7 +64,7 @@ export const LeftBarStyle = styled.div`
   flex-direction: column;
   flex-shrink: 0;
   justify-content: space-between;
-  padding: 6px;
+  padding: 6px 3px;
 
   @media (max-width: ${SMALL_SCREEN}px) {
     flex-direction: row;

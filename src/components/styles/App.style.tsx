@@ -70,7 +70,7 @@ export const LoadingRingStyle = styled.div`
 
 export const QueryCtnrStyle = styled.div`
   display: flex;
-  gap: 0.3rem;
+  gap: 0.25rem;
   grid-column: 1 / -1;
 
   & > * {

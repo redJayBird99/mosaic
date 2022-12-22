@@ -7,6 +7,7 @@ import {
   CtnrVotesStyle,
   ImgStyle,
   LeftBarStyle,
+  PostAnchorStyle,
   PostContentStyle,
   PostCtnrInfoStyle,
   PostStyle,
@@ -15,19 +16,24 @@ import {
   VideoStyle,
 } from "./styles/post.style";
 import dashjs from "dashjs";
+import { timeSince } from "../util/util";
 
 /** container for a listing reddit post, render the post content, infos and user post controls */
 export function Post({ c }: { c: Content }) {
+  const d = new Date(c.created);
+
   return (
     <PostStyle className="post">
       <PostLeftSide score={c.score} ratio={c.voteRatio} />
       <PostContentStyle>
-        <PostTitleStyle>{c.title}</PostTitleStyle>
+        <PostAnchorStyle href={c.link} target="_blank">
+          <PostTitleStyle>{c.title}</PostTitleStyle>
+        </PostAnchorStyle>
         <PostMediaContent video={c.video} images={c.images} />
         <PostCtnrInfoStyle>
           by <strong>{c.author}</strong>
-          <time className="post__date">
-            {" " + new Date(c.created).toLocaleDateString()}
+          <time className="post__date" title={d.toDateString()}>
+            {` ${timeSince(d)} ago`}
           </time>
           {" on subreddit "}
           <strong>{c.subreddit}</strong>
