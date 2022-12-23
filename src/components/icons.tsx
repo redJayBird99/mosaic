@@ -19,9 +19,13 @@ const IconHoverStyle = styled.svg`
   }
 `;
 
-export function Save() {
+export function Save({ active }: { active: boolean }) {
   return (
-    <SmallIconStyle xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <SmallIconStyle
+      className={active ? "saved" : ""}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+    >
       <path
         fill="#42404f"
         fillRule="nonzero"
@@ -45,9 +49,10 @@ export function Share() {
   );
 }
 
-export function Flag() {
+export function Flag({ active }: { active: boolean }) {
   return (
     <SmallIconStyle
+      className={active ? "flagged" : ""}
       viewBox="0 0 16 16"
       xmlns="http://www.w3.org/2000/svg"
       version="1.1"

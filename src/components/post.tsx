@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Content, Media, MediaVideo } from "../reddit/reddit";
 import { Flag, Save, Share } from "./icons";
 import { IconBtnGlowStyle } from "./styles/button.style";
@@ -19,6 +19,7 @@ import {
 import dashjs from "dashjs";
 import { timeSince } from "../util/util";
 import mGlass from "../asset/magnifying-glass.png";
+import { addToHistory, getHistory, UserHistory } from "../util/history";
 
 /** container for a listing reddit post, render the post content, infos and user post controls */
 export function Post({ c }: { c: Content }) {
@@ -26,7 +27,7 @@ export function Post({ c }: { c: Content }) {
 
   return (
     <PostStyle className="post">
-      <PostLeftSide score={c.score} ratio={c.voteRatio} />
+      <PostLeftSide score={c.score} ratio={c.voteRatio} id={c.id} />
       <PostContentStyle>
         <PostAnchorStyle href={c.link} target="_blank">
           <PostCtnrInfoStyle>
@@ -117,7 +118,15 @@ function getScrSet(images: Media[]) {
   return images.map((img) => `${img.url} ${img.width}w`).join(", ");
 }
 
-function PostLeftSide({ score, ratio }: { score: number; ratio: number }) {
+function PostLeftSide({
+  score,
+  ratio,
+  id,
+}: {
+  score: number;
+  ratio: number;
+  id: string;
+}) {
   const sc = score > 1000 ? `${Math.round(score / 1000)}k` : score;
   const arrow = score > 0 ? "ᐃ " : "ᐁ ";
   return (
@@ -128,12 +137,31 @@ function PostLeftSide({ score, ratio }: { score: number; ratio: number }) {
           {Math.round(ratio * 100)}% ratio
         </div>
       </CtnrVotesStyle>
-      <PostControls />
+      <PostControls id={id} />
     </LeftBarStyle>
   );
 }
 
-function PostControls() {
+function useControlStatus(
+  k: keyof UserHistory,
+  id: string
+): [boolean, () => void] {
+  const h = getHistory();
+  const [active, setStatus] = useState<boolean>(h[k].has(id));
+
+  return [
+    active,
+    () => {
+      addToHistory(k, id);
+      setStatus((state) => !state);
+    },
+  ];
+}
+
+function PostControls({ id }: { id: string }) {
+  const [saved, toggleSaved] = useControlStatus("saved", id);
+  const [flagged, toggleFlagged] = useControlStatus("flagged", id);
+
   return (
     <ControlsStyle>
       <li>
@@ -142,13 +170,17 @@ function PostControls() {
         </IconBtnGlowStyle>
       </li>
       <li>
-        <IconBtnGlowStyle title="Save" aria-label="Save">
-          <Save />
+        <IconBtnGlowStyle onClick={toggleSaved} title="Save" aria-label="Save">
+          <Save active={saved} />
         </IconBtnGlowStyle>
       </li>
       <li>
-        <IconBtnGlowStyle title="Report" aria-label="Report">
-          <Flag />
+        <IconBtnGlowStyle
+          onClick={toggleFlagged}
+          title="Report"
+          aria-label="Report"
+        >
+          <Flag active={flagged} />
         </IconBtnGlowStyle>
       </li>
     </ControlsStyle>

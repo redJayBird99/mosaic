@@ -64,3 +64,13 @@ h4 {
 .small-tx {
   font-size: 0.8rem;
 }
+
+.flagged {
+  filter: invert(18%) sepia(25%) saturate(7142%) hue-rotate(327deg)
+    brightness(94%) contrast(126%);
+}
+
+.saved {
+  filter: invert(14%) sepia(32%) saturate(5238%) hue-rotate(192deg)
+    brightness(97%) contrast(101%);
+}
