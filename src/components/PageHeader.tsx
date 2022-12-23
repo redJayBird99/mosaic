@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThreeBars } from "./icons";
 import {
@@ -11,23 +11,28 @@ import {
   HeaderBarStyle,
   LeftBlockStyle,
   PageHeaderStyle,
+  SearchBtnStyle,
+  SearchForm,
 } from "./styles/PageHeader.style";
 import { Search as SearchIcon } from "./icons";
 import { InputGroupControlStyle, InputGroupStyle } from "./styles/form.style";
 
 export function PageHeader(props: { toggleNav: () => void }) {
+  // it only effect small screen, on big screen it is always open
+  const [openSearch, setOpenSearch] = useState(false);
+
   return (
     <PageHeaderStyle>
       <HeaderBarStyle>
         <LeftBlock toggleNav={props.toggleNav} />
-        <Search />
-        <AuthButtons />
+        <Search open={openSearch} />
+        <HeadButtons toggleSearch={() => setOpenSearch((open) => !open)} />
       </HeaderBarStyle>
     </PageHeaderStyle>
   );
 }
 
-function Search() {
+function Search({ open }: { open: boolean }) {
   const navigate = useNavigate();
   const onSummit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,7 +51,7 @@ function Search() {
   };
 
   return (
-    <form onSubmit={onSummit} id="search">
+    <SearchForm className={open ? "open" : ""} onSubmit={onSummit} id="search">
       <InputGroupStyle>
         <SearchIcon />
         <InputGroupControlStyle
@@ -55,7 +60,7 @@ function Search() {
           placeholder="Search"
         />
       </InputGroupStyle>
-    </form>
+    </SearchForm>
   );
 }
 
@@ -70,9 +75,10 @@ function LeftBlock(props: { toggleNav: () => void }) {
   );
 }
 
-function AuthButtons() {
+function HeadButtons({ toggleSearch }: { toggleSearch: () => void }) {
   return (
     <AuthButtonsStyle>
+      <SearchBtnStyle onClick={toggleSearch}>search</SearchBtnStyle>
       <OutlineBtnStyle>log in</OutlineBtnStyle>
       <PrimaryBtnStyle>sign up</PrimaryBtnStyle>
     </AuthButtonsStyle>

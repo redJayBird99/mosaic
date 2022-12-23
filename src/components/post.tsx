@@ -29,17 +29,19 @@ export function Post({ c }: { c: Content }) {
       <PostLeftSide score={c.score} ratio={c.voteRatio} />
       <PostContentStyle>
         <PostAnchorStyle href={c.link} target="_blank">
+          <PostCtnrInfoStyle>
+            <span className="small-tx">by</span> <strong>{c.author}</strong>
+            <time className="post__date small-tx" title={d.toDateString()}>
+              {` ${timeSince(d)} ago`}
+            </time>
+            <span className="small-tx"> on subreddit </span>
+            <strong>{c.subreddit}</strong>
+          </PostCtnrInfoStyle>
+        </PostAnchorStyle>
+        <PostAnchorStyle href={c.link} target="_blank">
           <PostTitleStyle>{c.title}</PostTitleStyle>
         </PostAnchorStyle>
         <PostMediaContent video={c.video} images={c.images} />
-        <PostCtnrInfoStyle>
-          by <strong>{c.author}</strong>
-          <time className="post__date" title={d.toDateString()}>
-            {` ${timeSince(d)} ago`}
-          </time>
-          {" on subreddit "}
-          <strong>{c.subreddit}</strong>
-        </PostCtnrInfoStyle>
       </PostContentStyle>
     </PostStyle>
   );
@@ -122,7 +124,9 @@ function PostLeftSide({ score, ratio }: { score: number; ratio: number }) {
     <LeftBarStyle>
       <CtnrVotesStyle>
         <ScoreStyle title="votes">{arrow + sc}</ScoreStyle>
-        <div title="vote ratio">{Math.round(ratio * 100)}%</div>
+        <div title="vote ratio" className="small-tx">
+          {Math.round(ratio * 100)}% ratio
+        </div>
       </CtnrVotesStyle>
       <PostControls />
     </LeftBarStyle>

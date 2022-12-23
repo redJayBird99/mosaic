@@ -3,6 +3,7 @@ import { PostStyle } from "./post.style";
 
 export const SkeletonPostStyle = styled(PostStyle)`
   display: block;
+  border-radius: 5px;
   padding: 1rem;
 
   @keyframes wait-anime {

@@ -5,7 +5,7 @@ const SMALL_SCREEN = 450;
 export const PostStyle = styled.section`
   background-color: var(--bg-color);
   border: 1px solid var(--bg-color-200);
-  border-radius: 2px;
+  border-radius: 5px;
   box-shadow: 0px 1px 2px 0px hsl(0, 0%, 10%, 0.15);
   display: flex;
 
@@ -15,27 +15,30 @@ export const PostStyle = styled.section`
 `;
 
 export const PostContentStyle = styled.div`
+  border-radius: 0 5px 5px 0;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  gap: 5px;
+  gap: 3px;
   justify-content: space-between;
   overflow: hidden;
-  padding: 5px 0;
+  padding: 4px 0 0 0;
+
+  @media (max-width: ${SMALL_SCREEN}px) {
+    border-radius: 0 0 5px 5px;
+  }
 `;
 
 export const PostAnchorStyle = styled.a`
   color: var(--on-bg-color);
-  padding: 0 0.3rem;
   text-decoration: none;
 `;
 
 export const PostTitleStyle = styled.h2`
   font-weight: 400;
-  font-size: 1.3rem;
-  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  margin: 0 3px 4px 0.5rem;
   overflow-wrap: break-word;
-  text-align: center;
 `;
 
 export const VideoStyle = styled.video`
@@ -53,8 +56,8 @@ export const ImgStyle = styled.img`
 
 export const PostCtnrInfoStyle = styled.div`
   color: var(--on-bg-color-600);
-  font-size: 0.825rem;
-  padding: 0 0.5rem;
+  font-size: 0.9rem;
+  padding: 0 3px 0 0.5rem;
 `;
 
 export const LeftBarStyle = styled.div`
@@ -65,17 +68,20 @@ export const LeftBarStyle = styled.div`
   flex-shrink: 0;
   justify-content: space-between;
   padding: 6px 3px;
+  border-radius: 5px 0 0 5px;
 
   @media (max-width: ${SMALL_SCREEN}px) {
+    border-radius: 5px 5px 0 0;
     flex-direction: row;
     background: linear-gradient(270deg, var(--bg-color), var(--bg-color-50));
     border-right: none;
     border-bottom: 1px solid var(--bg-color-100);
+    padding: 3px 6px;
   }
 `;
 
 export const CtnrVotesStyle = styled.div`
-  align-items: center;
+  align-items: baseline;
   display: flex;
   color: var(--on-bg-color-600);
   gap: 0.5rem;

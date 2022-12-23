@@ -127,7 +127,7 @@ function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
           }
         });
       },
-      { rootMargin: "300px" }
+      { rootMargin: "200px" }
     )
   );
 
