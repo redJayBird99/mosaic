@@ -22,6 +22,9 @@ export function NavBar(props: { open: boolean }) {
         <LiStyle className="nav-setting">
           <NavLink to="top" />
         </LiStyle>
+        <LiStyle>
+          <NavLink to="saved" />
+        </LiStyle>
       </ul>
     </NavBarStyle>
   );

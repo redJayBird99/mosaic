@@ -32,7 +32,7 @@ export function Post({ c }: { c: Content }) {
 
   return (
     <PostStyle className="post">
-      <PostLeftSide score={c.score} ratio={c.voteRatio} id={c.id} />
+      <PostLeftSide c={c} />
       <PostContentStyle>
         <PostAnchorStyle href={c.link} target="_blank">
           <PostCtnrInfoStyle>
@@ -123,49 +123,41 @@ function getScrSet(images: Media[]) {
   return images.map((img) => `${img.url} ${img.width}w`).join(", ");
 }
 
-function PostLeftSide({
-  score,
-  ratio,
-  id,
-}: {
-  score: number;
-  ratio: number;
-  id: string;
-}) {
-  const sc = score > 1000 ? `${Math.round(score / 1000)}k` : score;
-  const arrow = score > 0 ? "ᐃ " : "ᐁ ";
+function PostLeftSide({ c }: { c: Content }) {
+  const sc = c.score > 1000 ? `${Math.round(c.score / 1000)}k` : c.score;
+  const arrow = c.score > 0 ? "ᐃ " : "ᐁ ";
   return (
     <LeftBarStyle>
       <CtnrVotesStyle>
         <ScoreStyle title="votes">{arrow + sc}</ScoreStyle>
         <div title="vote ratio" className="small-tx">
-          {Math.round(ratio * 100)}% ratio
+          {Math.round(c.voteRatio * 100)}% ratio
         </div>
       </CtnrVotesStyle>
-      <PostControls id={id} />
+      <PostControls c={c} />
     </LeftBarStyle>
   );
 }
 
 function useControlStatus(
   k: keyof UserHistory,
-  id: string
+  c: Content
 ): [boolean, () => void] {
   const h = getHistory();
-  const [active, setStatus] = useState<boolean>(h[k].has(id));
+  const [active, setStatus] = useState<boolean>(h[k].has(c.id));
 
   return [
     active,
     () => {
-      active ? deleteFromHistory(k, id) : addToHistory(k, id);
+      active ? deleteFromHistory(k, c) : addToHistory(k, c);
       setStatus(!active);
     },
   ];
 }
 
-function PostControls({ id }: { id: string }) {
-  const [saved, toggleSaved] = useControlStatus("saved", id);
-  const [flagged, toggleFlagged] = useControlStatus("flagged", id);
+function PostControls({ c }: { c: Content }) {
+  const [saved, toggleSaved] = useControlStatus("saved", c);
+  const [flagged, toggleFlagged] = useControlStatus("flagged", c);
 
   return (
     <ControlsStyle>

@@ -1,4 +1,7 @@
+import { Content } from "../reddit/reddit";
+
 const KEY = "mosaic-history";
+const SAVED_CONTENT_KEY = "mosaic-saved";
 export type UserHistory = {
   // the strings are ids
   flagged: Set<string>;
@@ -30,10 +33,47 @@ function updateHistory(update: (h: UserHistory) => void) {
   );
 }
 
-export function addToHistory(k: keyof UserHistory, id: string): void {
-  updateHistory((history) => history[k].add(id));
+export function addToHistory(k: keyof UserHistory, c: Content): void {
+  updateHistory((history) => {
+    history[k].add(c.id);
+
+    if (k === "saved") {
+      addToSavedContent(c);
+    }
+  });
 }
 
-export function deleteFromHistory(k: keyof UserHistory, id: string): void {
-  updateHistory((history) => history[k].delete(id));
+export function deleteFromHistory(k: keyof UserHistory, c: Content): void {
+  updateHistory((history) => {
+    history[k].delete(c.id);
+
+    if (k === "saved") {
+      deleteFromSavedContent(c);
+    }
+  });
+}
+
+export function getSavedContent(): Content[] {
+  return JSON.parse(localStorage.getItem(SAVED_CONTENT_KEY) ?? "[]");
+}
+
+function updateSavedContent(update: (c: Content[]) => void) {
+  const saved = getSavedContent();
+  update(saved);
+  localStorage.setItem(SAVED_CONTENT_KEY, JSON.stringify(saved));
+}
+
+/** add to the saves without checking for duplication */
+function addToSavedContent(c: Content) {
+  updateSavedContent((cs) => cs.push(c));
+}
+
+function deleteFromSavedContent(c: Content) {
+  updateSavedContent((saved) => {
+    const i = saved.findIndex((save) => save.id === c.id);
+
+    if (i !== -1) {
+      saved.splice(i, 1);
+    }
+  });
 }

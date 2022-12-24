@@ -1,3 +1,5 @@
+import { getSavedContent } from "../util/history";
+
 type JsonRes = any;
 type RedditPosition = {
   limit: number;
@@ -79,8 +81,15 @@ export function serializeQuery(q: Query): { [key: string]: string } {
   return rst;
 }
 
+export interface ContentBatch {
+  /** get a batch of Content */
+  getBatch(): Promise<Content[] | null>;
+  /** what was searching */
+  q?: string;
+}
+
 /** an interface to fetch and consume content from the reddit api */
-export class ContentBatch {
+class RemoteBatch {
   private buff = [];
   private count = 0;
   private after: undefined | string;
@@ -106,7 +115,6 @@ export class ContentBatch {
       });
       this.fetching = false;
 
-      console.log(json.data);
       if (json.data.dist === 0) {
         return null;
       }
@@ -122,9 +130,25 @@ export class ContentBatch {
   }
 }
 
+export class SavedBatch {
+  private buff = getSavedContent();
+
+  /** get a batch of the content saved by the user, from the reddit api (some duplicate is possible),
+   * @Returns an array if it was able to find some posts otherwise null
+   */
+  async getBatch(): Promise<Content[] | null> {
+    console.log(this.buff);
+    if (this.buff.length === 0) {
+      return null;
+    }
+
+    return this.buff.splice(0, 8);
+  }
+}
+
 /** get and store content from the given reddit listing */
 export function listingContent(listing: string): ContentBatch {
-  return new ContentBatch(
+  return new RemoteBatch(
     (p: RedditPosition) => getListing(listing, p),
     listing
   );
@@ -132,7 +156,7 @@ export function listingContent(listing: string): ContentBatch {
 
 /** get and store content from the given reddit listing */
 export function searchContent(q: Query): ContentBatch {
-  return new ContentBatch((p: RedditPosition) => search(q, p), q.q ?? "");
+  return new RemoteBatch((p: RedditPosition) => search(q, p), q.q ?? "");
 }
 
 /** if the give data is an video or a image response converts it to Content */

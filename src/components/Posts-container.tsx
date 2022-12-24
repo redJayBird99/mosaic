@@ -81,7 +81,7 @@ function PostsTail({ obs }: { obs: IntersectionObserver }) {
     return () => {
       obs.unobserve(divRef.current!);
     };
-  }, []);
+  }, [obs]);
 
   return <div ref={divRef}></div>;
 }
