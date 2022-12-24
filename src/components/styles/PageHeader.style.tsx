@@ -41,7 +41,7 @@ export const SearchForm = styled.form`
     visibility: hidden;
     left: 0;
     opacity: 0;
-    padding: 5px 1rem;
+    padding: 0 1rem 4px 1rem;
     position: absolute;
     top: 100%;
     transition: all 0.3s linear;

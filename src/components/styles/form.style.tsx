@@ -20,6 +20,7 @@ export const InputGroupStyle = styled.div`
 export const InputGroupControlStyle = styled.input`
   background-color: transparent;
   border: none;
+  flex-grow: 1;
   outline: none;
 `;
 

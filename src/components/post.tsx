@@ -19,7 +19,12 @@ import {
 import dashjs from "dashjs";
 import { timeSince } from "../util/util";
 import mGlass from "../asset/magnifying-glass.png";
-import { addToHistory, getHistory, UserHistory } from "../util/history";
+import {
+  addToHistory,
+  deleteFromHistory,
+  getHistory,
+  UserHistory,
+} from "../util/history";
 
 /** container for a listing reddit post, render the post content, infos and user post controls */
 export function Post({ c }: { c: Content }) {
@@ -152,8 +157,8 @@ function useControlStatus(
   return [
     active,
     () => {
-      addToHistory(k, id);
-      setStatus((state) => !state);
+      active ? deleteFromHistory(k, id) : addToHistory(k, id);
+      setStatus(!active);
     },
   ];
 }

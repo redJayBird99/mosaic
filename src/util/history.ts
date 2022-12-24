@@ -18,9 +18,9 @@ export function getHistory(): UserHistory {
   });
 }
 
-export function addToHistory(k: keyof UserHistory, id: string): void {
+function updateHistory(update: (h: UserHistory) => void) {
   const history = getHistory();
-  history[k].add(id);
+  update(history);
   localStorage.setItem(
     KEY,
     JSON.stringify({
@@ -28,4 +28,12 @@ export function addToHistory(k: keyof UserHistory, id: string): void {
       saved: [...history.saved],
     })
   );
+}
+
+export function addToHistory(k: keyof UserHistory, id: string): void {
+  updateHistory((history) => history[k].add(id));
+}
+
+export function deleteFromHistory(k: keyof UserHistory, id: string): void {
+  updateHistory((history) => history[k].delete(id));
 }
