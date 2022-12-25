@@ -27,25 +27,15 @@ export type Content = {
 };
 
 async function redditFetch(url: string) {
-  try {
-    const res = await fetch(url);
+  const res = await fetch(url);
 
-    if (res.ok) {
-      return await res.json();
-    } else {
-      // TODO
-      console.error(res.status);
-    }
-  } catch (err) {
+  if (res.ok) {
+    return await res.json();
+  } else {
     // TODO
-    console.error(err);
+    console.error(res.status);
+    throw new Error(`the request resolved with ${res.status} status`);
   }
-
-  // const res = await fetch(url);
-  // if (res.ok) {
-  //   throw new Error("net off");
-  //   return await res.json();
-  // }
 }
 
 /** fetch from the reddit api the given listing and return the response as a json */
@@ -90,12 +80,12 @@ export function serializeQuery(q: Query): { [key: string]: string } {
 export interface ContentBatch {
   /** get a batch of Content */
   getBatch(): Promise<Content[] | null>;
-  /** what was searching */
+  /** what was searching or listing */
   q?: string;
 }
 
 /** an interface to fetch and consume content from the reddit api */
-class RemoteBatch {
+class RemoteBatch implements ContentBatch {
   private buff = [];
   private count = 0;
   private after: undefined | string;
@@ -136,7 +126,7 @@ class RemoteBatch {
   }
 }
 
-export class SavedBatch {
+export class SavedBatch implements ContentBatch {
   private buff = getSavedContent();
 
   /** get a batch of the content saved by the user, from the reddit api (some duplicate is possible),

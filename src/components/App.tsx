@@ -56,9 +56,10 @@ function Search() {
     };
   }
 
+  // random because we want a full refresh when already on current url (the state of the posts change with time)
   return (
     <Posts
-      key={`${q.q}${q.sort}${q.t}`}
+      key={Math.random()}
       reddit={searchContent(q)}
       Controls={SearchControls(q, onChange)}
     />
@@ -93,9 +94,9 @@ function SearchControls(q: Query, onChange: (k: keyof Query) => HandleChange) {
 }
 
 function Listing() {
-  const listing = useParams().listing ?? "";
-  const redditRef = useRef(listingContent(listing || "best"));
-  return <Posts key={listing} reddit={redditRef.current} />;
+  const listing = useParams().listing ?? "best";
+  // random key because we want a full refresh when already on current url (the state of the posts change with time)
+  return <Posts key={Math.random()} reddit={listingContent(listing)} />;
 }
 
 function Saved() {
@@ -104,8 +105,8 @@ function Saved() {
     return <div style={{ textAlign: "center" }}>sorry, nothing was saved </div>;
   }
 
-  const redditRef = useRef(new SavedBatch());
-  return <Posts key="saved" reddit={redditRef.current} />;
+  // we don't need a refresh here (the state of the posts is save locally...)
+  return <Posts reddit={new SavedBatch()} />;
 }
 
 type FetcherState = {
@@ -144,33 +145,27 @@ function contentFetchReducer(state: FetcherState, action: FetcherAction) {
   }
 }
 
-function useRedditApi(reddit: ContentBatch) {
+function useRedditApi(reddit: ContentBatch): [FetcherState, () => void] {
   const [state, dispatch] = useReducer(contentFetchReducer, {
     c: [],
     loading: true,
     error: false,
     end: false,
   });
-  // only one fetch call for render (because the intersectingObserver could fire multiple times in a cycle)
-  let fetchCalled = false;
 
   async function fetchContent() {
-    if (fetchCalled) {
-      return;
-    }
-
-    fetchCalled = true;
     let batch: Content[] | null = [];
 
     try {
       batch = await reddit.getBatch();
     } catch (e) {
+      // TODO: add some info
       dispatch({ type: "FETCH_ERROR" });
     }
 
     if (batch === null) {
       dispatch({ type: "FETCH_END" });
-    } else {
+    } else if (batch.length > 0) {
       dispatch({ type: "FETCH_SUCCESS", c: batch });
 
       // TODO
@@ -182,35 +177,33 @@ function useRedditApi(reddit: ContentBatch) {
     }
   }
 
-  // this is depended on the ContentBatch but it doesn't never change because
-  // when a new listing is navigated the page content is reconstructed
-  // useEffect(() => , [reddit]);
-
-  return [state, fetchContent] as [FetcherState, () => void];
+  return [state, fetchContent];
 }
 
-/** render the posts from the given content fetcher, or a not fund one */
+/** render the posts from the given content fetcher, or fallback component (error or not found) */
 function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
   const [state, fetchContent] = useRedditApi(props.reddit);
-
-  const obs = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          fetchContent();
-        }
-      });
-    },
-    { rootMargin: "200px" }
+  // we don't need to update it, because when ContentBatch change the entire
+  // component is rebuild from scratch on every navigation
+  const obsRef = useRef(
+    new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            fetchContent();
+          }
+        });
+      },
+      { rootMargin: "200px" }
+    )
   );
 
-  // the ContentBatch doesn't never change because when a new listing is
-  // navigated the page content is rebuild, so it would be save to skip
   useEffect(() => {
     fetchContent();
   }, [props.reddit]);
 
   if (state.error) {
+    // TODO
     return <div>Error was occurred</div>;
   } else if (state.end && state.c.length === 0) {
     return <NotFound term={props.reddit.q ?? ""} />;
@@ -218,7 +211,7 @@ function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
     return (
       <PostsContainer
         c={state.c}
-        obs={obs}
+        obs={obsRef.current}
         loading={state.loading}
         Controls={props.Controls}
       />
