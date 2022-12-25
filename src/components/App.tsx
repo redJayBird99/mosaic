@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useReducer, useRef, useState } from "react";
 import { Outlet, useParams, useSearchParams } from "react-router-dom";
 import {
   Content,
@@ -108,12 +108,49 @@ function Saved() {
   return <Posts key="saved" reddit={redditRef.current} />;
 }
 
-/** render the posts from the given content fetcher, or a not fund one */
-function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
-  // if the content is null nothing was found
-  const [state, setState] = useState<{ c: Content[] | null; loading: boolean }>(
-    { c: [], loading: true }
-  );
+type FetcherState = {
+  c: Content[];
+  error: boolean;
+  loading: boolean;
+  end: boolean;
+};
+
+type FetcherAction = {
+  type: "FETCH_SUCCESS" | "FETCH_ERROR" | "FETCH_END";
+  c?: Content[];
+};
+
+function contentFetchReducer(state: FetcherState, action: FetcherAction) {
+  switch (action.type) {
+    case "FETCH_SUCCESS":
+      return {
+        ...state,
+        loading: false,
+        c: state.c.concat(action.c ?? []),
+      };
+    case "FETCH_ERROR": {
+      return {
+        ...state,
+        loading: false,
+        error: true,
+      };
+    }
+    case "FETCH_END":
+      return {
+        ...state,
+        loading: false,
+        end: true,
+      };
+  }
+}
+
+function useRedditApi(reddit: ContentBatch) {
+  const [state, dispatch] = useReducer(contentFetchReducer, {
+    c: [],
+    loading: true,
+    error: false,
+    end: false,
+  });
   // only one fetch call for render (because the intersectingObserver could fire multiple times in a cycle)
   let fetchCalled = false;
 
@@ -123,20 +160,38 @@ function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
     }
 
     fetchCalled = true;
-    const batch = await props.reddit.getBatch();
+    let batch: Content[] | null = [];
 
-    if (batch === null && state.c?.length === 0) {
-      setState({ c: null, loading: false });
-    } else if (batch && batch.length > 0) {
-      setState((s) => ({ ...s, c: s.c!.concat(batch) }));
+    try {
+      batch = await reddit.getBatch();
+    } catch (e) {
+      dispatch({ type: "FETCH_ERROR" });
+    }
 
-      if (state.loading) {
-        // two options to remove the loading, one is o fire a load event or wait a little for every case
-        // for now the latter was picked
-        setTimeout(() => setState((s) => ({ ...s, loading: false })), 200);
-      }
+    if (batch === null) {
+      dispatch({ type: "FETCH_END" });
+    } else {
+      dispatch({ type: "FETCH_SUCCESS", c: batch });
+
+      // TODO
+      // if (state.loading) {
+      //   // two options to remove the loading, one is o fire a load event or wait a little for every case
+      //   // for now the latter was picked
+      //   setTimeout(() => setState((s) => ({ ...s, loading: false })), 200);
+      // }
     }
   }
+
+  // this is depended on the ContentBatch but it doesn't never change because
+  // when a new listing is navigated the page content is reconstructed
+  // useEffect(() => , [reddit]);
+
+  return [state, fetchContent] as [FetcherState, () => void];
+}
+
+/** render the posts from the given content fetcher, or a not fund one */
+function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
+  const [state, fetchContent] = useRedditApi(props.reddit);
 
   const obs = new IntersectionObserver(
     (entries) => {
@@ -149,11 +204,17 @@ function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
     { rootMargin: "200px" }
   );
 
+  // the ContentBatch doesn't never change because when a new listing is
+  // navigated the page content is rebuild, so it would be save to skip
   useEffect(() => {
     fetchContent();
-  }, []);
+  }, [props.reddit]);
 
-  if (state.c) {
+  if (state.error) {
+    return <div>Error was occurred</div>;
+  } else if (state.end && state.c.length === 0) {
+    return <NotFound term={props.reddit.q ?? ""} />;
+  } else {
     return (
       <PostsContainer
         c={state.c}
@@ -162,7 +223,5 @@ function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
         Controls={props.Controls}
       />
     );
-  } else {
-    return <NotFound term={props.reddit.q ?? ""} />;
   }
 }

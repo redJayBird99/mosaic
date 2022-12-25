@@ -40,6 +40,12 @@ async function redditFetch(url: string) {
     // TODO
     console.error(err);
   }
+
+  // const res = await fetch(url);
+  // if (res.ok) {
+  //   throw new Error("net off");
+  //   return await res.json();
+  // }
 }
 
 /** fetch from the reddit api the given listing and return the response as a json */
