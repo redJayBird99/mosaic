@@ -77,19 +77,22 @@ export function serializeQuery(q: Query): { [key: string]: string } {
   return rst;
 }
 
+export type Batch = { data: Content[]; done: boolean };
 export interface ContentBatch {
   /** get a batch of Content */
-  getBatch(): Promise<Content[] | null>;
+  getBatch(): Promise<Batch>;
   /** what was searching or listing */
   q?: string;
 }
 
 /** an interface to fetch and consume content from the reddit api */
 class RemoteBatch implements ContentBatch {
-  private buff = [];
+  private buff: Content[] = [];
   private count = 0;
   private after: undefined | string;
   private fetching = false;
+  // true there are no more remote content to fetch
+  private remoteEnd = false;
 
   /** the fetcher is responsible for the specific reddit api request, while this class keep track of position */
   constructor(
@@ -99,10 +102,10 @@ class RemoteBatch implements ContentBatch {
 
   /** get around the next 10 media content to show, from the reddit api (some duplicate is possible),
    * multiple called while it is already fetching are ignore,
-   * @Returns an array if it was able to find some posts otherwise null
+   * @Returns an array of content and a flag indicating if there is more content available
    */
-  async getBatch(): Promise<Content[] | null> {
-    if (!this.fetching && this.buff.length === 0) {
+  async getBatch(): Promise<Batch> {
+    if (!this.remoteEnd && !this.fetching && this.buff.length === 0) {
       this.fetching = true;
       const json = await this.fetcher({
         limit: 30,
@@ -111,8 +114,8 @@ class RemoteBatch implements ContentBatch {
       });
       this.fetching = false;
 
-      if (json.data.dist === 0) {
-        return null;
+      if (!json.data.after) {
+        this.remoteEnd = true;
       }
 
       this.buff = json.data.children
@@ -122,7 +125,11 @@ class RemoteBatch implements ContentBatch {
       this.count += 30;
     }
 
-    return this.buff.splice(0, this.buff.length <= 14 ? this.buff.length : 10);
+    const batch = this.buff.splice(
+      0,
+      this.buff.length <= 14 ? this.buff.length : 10
+    );
+    return { data: batch, done: this.remoteEnd && this.buff.length === 0 };
   }
 }
 
@@ -130,15 +137,11 @@ export class SavedBatch implements ContentBatch {
   private buff = getSavedContent();
 
   /** get a batch of the content saved by the user, from the reddit api (some duplicate is possible),
-   * @Returns an array if it was able to find some posts otherwise null
+   * @Returns an array of content and a flag indicating if there is more content available
    */
-  async getBatch(): Promise<Content[] | null> {
-    console.log(this.buff);
-    if (this.buff.length === 0) {
-      return null;
-    }
-
-    return this.buff.splice(0, 8);
+  async getBatch(): Promise<Batch> {
+    const batch = this.buff.splice(0, 10);
+    return { data: batch, done: this.buff.length === 0 };
   }
 }
 

@@ -5,8 +5,7 @@ export const CtnrPostsStyle = styled.main<{ cols: number }>`
   grid-template-columns: repeat(${(props) => props.cols}, minmax(0px, 43rem));
   gap: 0.5rem;
   justify-content: center;
-  margin: auto;
-  margin-top: 1rem;
+  margin: 1rem auto;
   max-width: 88rem;
   min-height: 105vh;
   padding: 0px 0.5rem;

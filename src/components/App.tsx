@@ -10,6 +10,7 @@ import {
   Query,
   serializeQuery,
   SavedBatch,
+  Batch,
 } from "../reddit/reddit";
 import { getHistory } from "../util/history";
 import { NavBar } from "./nav-bar";
@@ -141,6 +142,7 @@ function contentFetchReducer(state: FetcherState, action: FetcherAction) {
         ...state,
         loading: false,
         end: true,
+        c: state.c.concat(action.c ?? []),
       };
   }
 }
@@ -154,7 +156,7 @@ function useRedditApi(reddit: ContentBatch): [FetcherState, () => void] {
   });
 
   async function fetchContent() {
-    let batch: Content[] | null = [];
+    let batch: Batch = { data: [], done: false };
 
     try {
       batch = await reddit.getBatch();
@@ -163,10 +165,10 @@ function useRedditApi(reddit: ContentBatch): [FetcherState, () => void] {
       dispatch({ type: "FETCH_ERROR" });
     }
 
-    if (batch === null) {
-      dispatch({ type: "FETCH_END" });
-    } else if (batch.length > 0) {
-      dispatch({ type: "FETCH_SUCCESS", c: batch });
+    if (batch.done) {
+      dispatch({ type: "FETCH_END", c: batch.data });
+    } else if (batch.data.length > 0) {
+      dispatch({ type: "FETCH_SUCCESS", c: batch.data });
 
       // TODO
       // if (state.loading) {
@@ -184,18 +186,15 @@ function useRedditApi(reddit: ContentBatch): [FetcherState, () => void] {
 function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
   const [state, fetchContent] = useRedditApi(props.reddit);
   // we don't need to update it, because when ContentBatch change the entire
-  // component is rebuild from scratch on every navigation
+  // component is rebuild from scratch on every navigation, although it still initial and ignored currently
   const obsRef = useRef(
-    new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            fetchContent();
-          }
-        });
-      },
-      { rootMargin: "200px" }
-    )
+    new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          fetchContent();
+        }
+      });
+    })
   );
 
   useEffect(() => {
@@ -213,6 +212,7 @@ function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
         c={state.c}
         obs={obsRef.current}
         loading={state.loading}
+        end={state.end}
         Controls={props.Controls}
       />
     );

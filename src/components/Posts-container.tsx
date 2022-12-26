@@ -13,6 +13,7 @@ export class PostsContainer extends React.PureComponent<
     c: Content[];
     obs: IntersectionObserver;
     loading: boolean;
+    end: boolean;
     Controls?: JSX.Element;
   },
   {}
@@ -37,23 +38,36 @@ export class PostsContainer extends React.PureComponent<
       return null;
     }
 
-    return this.props.c
-      .reduce(
-        (a, c, i) => {
-          a[i % cols].push(<Post key={c.id} c={c} />);
-          return a;
-        },
-        Array.from({ length: cols }, () => [] as JSX.Element[])
-      )
-      .map((list, i) => (
+    // split the content in the given amount of column lists
+    const list = this.props.c.reduce(
+      (a, c, i) => {
+        a[i % cols].push(<Post key={c.id} c={c} />);
+        return a;
+      },
+      Array.from({ length: cols }, () => [] as JSX.Element[])
+    );
+
+    if (this.props.end) {
+      return list.map((list, i) => <div key={i}>{list}</div>);
+    }
+
+    // if there is still something to fetch add skeletons and intersection observers
+    return list.map((list, i) => {
+      // add the tail a little bit before the content end so we can try to prefetch
+      list.splice(
+        list.length - 2,
+        0,
+        <PostsTail key={`tail${i}`} obs={this.props.obs} />
+      );
+      return (
         <div key={i}>
           {list}
-          <PostsTail key={`tail${i}`} obs={this.props.obs} />
           {Array.from({ length: 3 }, (_, j) => (
             <SkeletonPost key={j} />
           ))}
         </div>
-      ));
+      );
+    });
   }
 
   render() {
@@ -63,6 +77,7 @@ export class PostsContainer extends React.PureComponent<
         {this.props.Controls}
         {this.props.loading && <LoadingWindow />}
         {this.renderColumn(cols)}
+        <PostsTail obs={this.props.obs} />
       </CtnrPostsStyle>
     );
   }
