@@ -92,6 +92,13 @@ function Video({ v }: { v: MediaVideo }) {
     if (dashjs.supportsMediaSource()) {
       try {
         const player = dashjs.MediaPlayer().create();
+        player.updateSettings({
+          streaming: {
+            scheduling: {
+              scheduleWhilePaused: false,
+            },
+          },
+        });
         player.initialize(videoRef.current!, videoRef.current!.src, false);
         return () => {
           player.destroy();
@@ -109,6 +116,8 @@ function Video({ v }: { v: MediaVideo }) {
   return (
     <VideoStyle
       ref={videoRef}
+      preload="metadata"
+      poster={v.poster}
       style={{
         maxHeight: `${v.height > 600 ? 600 : v.height}px`,
         aspectRatio: `${v.width / v.height}`,

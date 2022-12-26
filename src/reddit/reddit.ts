@@ -12,7 +12,11 @@ export type Media = {
   height: number;
 };
 /** the url is a MPEG-DASH url */
-export type MediaVideo = { hls_url: string; fallback_url: string } & Media;
+export type MediaVideo = {
+  hls_url: string;
+  fallback_url: string;
+  poster: string;
+} & Media;
 export type Content = {
   id: string;
   title: string;
@@ -88,6 +92,7 @@ export interface ContentBatch {
 /** an interface to fetch and consume content from the reddit api */
 class RemoteBatch implements ContentBatch {
   private buff: Content[] = [];
+  private fetched = new Set<string>();
   private count = 0;
   private after: undefined | string;
   private fetching = false;
@@ -120,7 +125,12 @@ class RemoteBatch implements ContentBatch {
 
       this.buff = json.data.children
         .map((r: JsonRes) => toMediaContent(r.data))
-        .filter((r: Content | undefined) => r);
+        .filter((r: Content | undefined) => {
+          if (r && !this.fetched.has(r.id)) {
+            this.fetched.add(r.id);
+            return true;
+          }
+        });
       this.after = json.data.after;
       this.count += 30;
     }
@@ -180,6 +190,10 @@ function toMediaContent(data: JsonRes): Content | undefined {
         url: data?.media?.["reddit_video"]?.["dash_url"],
         fallback_url: data?.media?.["reddit_video"]?.["fallback_url"],
         hls_url: data?.media?.["reddit_video"]?.["hls_url"],
+        poster:
+          data.preview?.images[0]?.resolutions?.findLast(
+            (img: any) => img.width < 640 // a low resolution for a poster should be decent enough
+          )?.url ?? "",
       },
     } as Content;
   } else if (
