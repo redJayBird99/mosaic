@@ -118,3 +118,11 @@ export function ThreeBars() {
     </IconHoverStyle>
   );
 }
+
+export function Close() {
+  return (
+    <svg fill="#e32636" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5.997 6.784l4.454 4.359.787-.804-4.43-4.336 4.465-4.3-.78-.81-4.49 4.323L1.55.857l-.787.804 4.43 4.336-4.465 4.3.78.81 4.49-4.323z" />
+    </svg>
+  );
+}

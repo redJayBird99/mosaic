@@ -16,6 +16,8 @@ import {
 } from "./styles/PageHeader.style";
 import { Search as SearchIcon } from "./icons";
 import { InputGroupControlStyle, InputGroupStyle } from "./styles/form.style";
+import { SignUpDialog } from "./auth";
+import { isLoggedIn, logOut } from "../util/account";
 
 export function PageHeader(props: { toggleNav: () => void }) {
   // it only effect small screen, on big screen it is always open
@@ -79,8 +81,43 @@ function HeadButtons({ toggleSearch }: { toggleSearch: () => void }) {
   return (
     <AuthButtonsStyle>
       <SearchBtnStyle onClick={toggleSearch}>search</SearchBtnStyle>
-      <OutlineBtnStyle>log in</OutlineBtnStyle>
-      <PrimaryBtnStyle>sign up</PrimaryBtnStyle>
+      {isLoggedIn() ? <LogOut /> : <LogInBtn />}
+      <SignUpBtn />
     </AuthButtonsStyle>
   );
+}
+
+function LogInBtn() {
+  const [openDig, setOpenDig] = useState(false);
+
+  return (
+    <>
+      <OutlineBtnStyle onClick={() => setOpenDig(!openDig)}>
+        log in
+      </OutlineBtnStyle>
+      <SignUpDialog open={openDig} setOpen={setOpenDig} />
+    </>
+  );
+}
+
+function SignUpBtn() {
+  const [openDig, setOpenDig] = useState(false);
+
+  return (
+    <>
+      <PrimaryBtnStyle onClick={() => setOpenDig(!openDig)}>
+        sign up
+      </PrimaryBtnStyle>
+      <SignUpDialog open={openDig} setOpen={setOpenDig} />
+    </>
+  );
+}
+
+function LogOut() {
+  const navigate = useNavigate();
+  const onClick = () => {
+    logOut();
+    navigate(0);
+  };
+  return <OutlineBtnStyle onClick={onClick}>log out</OutlineBtnStyle>;
 }
