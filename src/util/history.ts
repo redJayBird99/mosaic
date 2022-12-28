@@ -1,8 +1,11 @@
 import { Content } from "../reddit/reddit";
+import { getLoggedIn } from "./account";
 
-const KEY = "mosaic-history";
-const SAVED_CONTENT_KEY = "mosaic-saved";
+const GUEST_KEY = "tmp";
+const savedContentKey = (user?: string) => `mosaic-${user ?? GUEST_KEY}-saved`;
+const historyKey = (user?: string) => `mosaic-${user ?? GUEST_KEY}-history`;
 export type UserHistory = {
+  user: string;
   // the strings are ids
   flagged: Set<string>;
   saved: Set<string>;
@@ -10,12 +13,15 @@ export type UserHistory = {
 let history: undefined | UserHistory;
 
 export function getHistory(): UserHistory {
-  if (history) {
+  const user = getLoggedIn()?.key;
+
+  if (history && history?.user === user) {
     return history;
   }
 
-  const h = JSON.parse(localStorage.getItem(KEY) ?? "{}");
+  const h = JSON.parse(localStorage.getItem(historyKey(user)) ?? "{}");
   return (history = {
+    user: user ?? GUEST_KEY,
     flagged: new Set(h?.flagged ?? []),
     saved: new Set(h?.saved ?? []),
   });
@@ -25,8 +31,9 @@ function updateHistory(update: (h: UserHistory) => void) {
   const history = getHistory();
   update(history);
   localStorage.setItem(
-    KEY,
+    historyKey(history.user),
     JSON.stringify({
+      user: history.user,
       flagged: [...history.flagged],
       saved: [...history.saved],
     })
@@ -35,45 +42,51 @@ function updateHistory(update: (h: UserHistory) => void) {
 
 export function addToHistory(k: keyof UserHistory, c: Content): void {
   updateHistory((history) => {
-    history[k].add(c.id);
+    if (k === "saved" || k === "flagged") {
+      history[k].add(c.id);
+    }
 
     if (k === "saved") {
-      addToSavedContent(c);
+      addToSavedContent(c, history.user);
     }
   });
 }
 
 export function deleteFromHistory(k: keyof UserHistory, c: Content): void {
   updateHistory((history) => {
-    history[k].delete(c.id);
+    if (k === "saved" || k === "flagged") {
+      history[k].delete(c.id);
+    }
 
     if (k === "saved") {
-      deleteFromSavedContent(c);
+      deleteFromSavedContent(c, history.user);
     }
   });
 }
 
 export function getSavedContent(): Content[] {
-  return JSON.parse(localStorage.getItem(SAVED_CONTENT_KEY) ?? "[]");
+  return JSON.parse(
+    localStorage.getItem(savedContentKey(getLoggedIn()?.key)) ?? "[]"
+  );
 }
 
-function updateSavedContent(update: (c: Content[]) => void) {
+function updateSavedContent(update: (c: Content[]) => void, user?: string) {
   const saved = getSavedContent();
   update(saved);
-  localStorage.setItem(SAVED_CONTENT_KEY, JSON.stringify(saved));
+  localStorage.setItem(savedContentKey(user), JSON.stringify(saved));
 }
 
 /** add to the saves without checking for duplication */
-function addToSavedContent(c: Content) {
-  updateSavedContent((cs) => cs.push(c));
+function addToSavedContent(c: Content, user?: string) {
+  updateSavedContent((cs) => cs.push(c), user);
 }
 
-function deleteFromSavedContent(c: Content) {
+function deleteFromSavedContent(c: Content, user?: string) {
   updateSavedContent((saved) => {
     const i = saved.findIndex((save) => save.id === c.id);
 
     if (i !== -1) {
       saved.splice(i, 1);
     }
-  });
+  }, user);
 }

@@ -62,9 +62,7 @@ export class PostsContainer extends React.PureComponent<
       return (
         <div key={i}>
           {list}
-          {Array.from({ length: 3 }, (_, j) => (
-            <SkeletonPost key={j} />
-          ))}
+          <SkeletonPost key="skeleton" />
         </div>
       );
     });

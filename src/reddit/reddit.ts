@@ -1,3 +1,4 @@
+import { getLoggedIn } from "../util/account";
 import { getSavedContent } from "../util/history";
 
 type JsonRes = any;

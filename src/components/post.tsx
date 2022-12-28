@@ -149,7 +149,7 @@ function PostLeftSide({ c }: { c: Content }) {
 }
 
 function useControlStatus(
-  k: keyof UserHistory,
+  k: "saved" | "flagged",
   c: Content
 ): [boolean, () => void] {
   const h = getHistory();

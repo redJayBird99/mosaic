@@ -118,7 +118,7 @@ type FetcherState = {
 };
 
 type FetcherAction = {
-  type: "FETCH_SUCCESS" | "FETCH_ERROR" | "FETCH_END";
+  type: "FETCH_SUCCESS" | "FETCH_ERROR" | "FETCH_END" | "STOP_LOADING";
   c?: Content[];
 };
 
@@ -127,22 +127,24 @@ function contentFetchReducer(state: FetcherState, action: FetcherAction) {
     case "FETCH_SUCCESS":
       return {
         ...state,
-        loading: false,
         c: state.c.concat(action.c ?? []),
       };
     case "FETCH_ERROR": {
       return {
         ...state,
-        loading: false,
         error: true,
       };
     }
     case "FETCH_END":
       return {
         ...state,
-        loading: false,
         end: true,
         c: state.c.concat(action.c ?? []),
+      };
+    case "STOP_LOADING":
+      return {
+        ...state,
+        loading: false,
       };
   }
 }
@@ -154,6 +156,13 @@ function useRedditApi(reddit: ContentBatch): [FetcherState, () => void] {
     error: false,
     end: false,
   });
+  const stopLoading = () => {
+    if (state.loading) {
+      // two options to remove the loading, one is o fire a load event or wait a little for every case
+      // for now the latter was picked
+      setTimeout(() => dispatch({ type: "STOP_LOADING" }), 100);
+    }
+  };
 
   async function fetchContent() {
     let batch: Batch = { data: [], done: false };
@@ -163,19 +172,15 @@ function useRedditApi(reddit: ContentBatch): [FetcherState, () => void] {
     } catch (e) {
       // TODO: add some info
       dispatch({ type: "FETCH_ERROR" });
+      stopLoading();
     }
 
     if (batch.done) {
       dispatch({ type: "FETCH_END", c: batch.data });
+      stopLoading();
     } else if (batch.data.length > 0) {
       dispatch({ type: "FETCH_SUCCESS", c: batch.data });
-
-      // TODO
-      // if (state.loading) {
-      //   // two options to remove the loading, one is o fire a load event or wait a little for every case
-      //   // for now the latter was picked
-      //   setTimeout(() => setState((s) => ({ ...s, loading: false })), 200);
-      // }
+      stopLoading();
     }
   }
 
