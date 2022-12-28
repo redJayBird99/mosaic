@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { IconBtnStyle } from "./button.style";
+import { IconBtnStyle, PrimaryBtnStyle } from "./button.style";
 
 export const DialogHeaderStyle = styled.div`
   display: flex;
@@ -30,4 +30,17 @@ export const DialogFormStyle = styled.form`
 export const HideLabelStyle = styled.label`
   position: absolute;
   left: -999rem;
+`;
+
+export const OutputStyle = styled.output`
+  display: block;
+  color: var(--error-color);
+  font-size: 0.75rem;
+  margin-top: 3px;
+  text-align: center;
+  width: 100%;
+`;
+
+export const SubmitBtnStyle = styled(PrimaryBtnStyle)`
+  width: 100%;
 `;

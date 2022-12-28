@@ -16,7 +16,7 @@ import {
 } from "./styles/PageHeader.style";
 import { Search as SearchIcon } from "./icons";
 import { InputGroupControlStyle, InputGroupStyle } from "./styles/form.style";
-import { SignUpDialog } from "./auth";
+import { LogInDialog, SignUpDialog } from "./auth";
 import { isLoggedIn, logOut } from "../util/account";
 
 export function PageHeader(props: { toggleNav: () => void }) {
@@ -81,8 +81,14 @@ function HeadButtons({ toggleSearch }: { toggleSearch: () => void }) {
   return (
     <AuthButtonsStyle>
       <SearchBtnStyle onClick={toggleSearch}>search</SearchBtnStyle>
-      {isLoggedIn() ? <LogOut /> : <LogInBtn />}
-      <SignUpBtn />
+      {isLoggedIn() ? (
+        <LogOut />
+      ) : (
+        <>
+          <LogInBtn />
+          <SignUpBtn />
+        </>
+      )}
     </AuthButtonsStyle>
   );
 }
@@ -95,7 +101,7 @@ function LogInBtn() {
       <OutlineBtnStyle onClick={() => setOpenDig(!openDig)}>
         log in
       </OutlineBtnStyle>
-      <SignUpDialog open={openDig} setOpen={setOpenDig} />
+      <LogInDialog key={Math.random()} open={openDig} setOpen={setOpenDig} />
     </>
   );
 }
@@ -108,7 +114,7 @@ function SignUpBtn() {
       <PrimaryBtnStyle onClick={() => setOpenDig(!openDig)}>
         sign up
       </PrimaryBtnStyle>
-      <SignUpDialog open={openDig} setOpen={setOpenDig} />
+      <SignUpDialog key={Math.random()} open={openDig} setOpen={setOpenDig} />
     </>
   );
 }

@@ -22,6 +22,10 @@ function getAccounts(): Account[] {
   return JSON.parse(localStorage.getItem(ACCOUNTS_KEY) ?? "[]");
 }
 
+export function hasAccount(key: string): boolean {
+  return Boolean(getAccounts().find((a) => a.key === key));
+}
+
 export function logIn(key: string, password: string): boolean {
   const acc = getAccounts().find((a) => a.key === key);
 
