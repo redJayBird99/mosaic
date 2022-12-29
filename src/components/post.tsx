@@ -193,11 +193,11 @@ function PostControls({ c }: { c: Content }) {
   );
 }
 
-export function NotFound({ term }: { term: string }) {
+export function NotFound({ text }: { text: string }) {
   return (
     <NotFoundStyle>
       <img src={mGlass} alt="magnifying glass" height="256" width="256" />
-      <h3>{`Sorry, we couldn't find any results for "${term}"`}</h3>
+      <h3>{text}</h3>
     </NotFoundStyle>
   );
 }

@@ -13,7 +13,7 @@ import {
   Batch,
 } from "../reddit/reddit";
 import { getHistory } from "../util/history";
-import { NavBar } from "./nav-bar";
+import { listings, NavBar } from "./nav-bar";
 import { PageHeader } from "./PageHeader";
 import { NotFound } from "./post";
 import { PostsContainer } from "./Posts-container";
@@ -24,10 +24,10 @@ export const mainRoutes = [
   { path: "search", element: <Search /> },
   { path: "saved", element: <Saved /> },
   { path: ":listing", element: <Listing /> },
-  { path: "", element: <Listing />, index: true },
+  { element: <Listing />, index: true },
 ];
 
-export function App() {
+export function Layout({ main }: { main: JSX.Element }) {
   const [nav, setNav] = useState(false);
   const toggleNav = () => setNav((nav) => !nav);
 
@@ -35,8 +35,22 @@ export function App() {
     <>
       <PageHeader toggleNav={toggleNav}></PageHeader>
       <NavBar open={nav} />
-      <Outlet />
+      {main}
     </>
+  );
+}
+
+export function App() {
+  return <Layout main={<Outlet />} />;
+}
+
+export function Page404() {
+  return <Layout main={<MainNotFound />} />;
+}
+
+function MainNotFound() {
+  return (
+    <NotFound text="404 Sorry, the page you are looking for doesn't exist" />
   );
 }
 
@@ -96,14 +110,19 @@ function SearchControls(q: Query, onChange: (k: keyof Query) => HandleChange) {
 
 function Listing() {
   const listing = useParams().listing ?? "best";
+  console.log("__love__", listing);
+
+  if (!listings.includes(listing)) {
+    return <MainNotFound />;
+  }
+
   // random key because we want a full refresh when already on current url (the state of the posts change with time)
   return <Posts key={Math.random()} reddit={listingContent(listing)} />;
 }
 
 function Saved() {
   if (getHistory().saved.size === 0) {
-    // TODO:
-    return <div style={{ textAlign: "center" }}>sorry, nothing was saved </div>;
+    return <NotFound text={"Sorry, we couldn't find any saved post"} />;
   }
 
   // we don't need a refresh here (the state of the posts is save locally...)
@@ -210,7 +229,15 @@ function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
     // TODO
     return <div>Error was occurred</div>;
   } else if (state.end && state.c.length === 0) {
-    return <NotFound term={props.reddit.q ?? ""} />;
+    return (
+      <NotFound
+        text={
+          props.reddit.q
+            ? `Sorry, we couldn't find any results for "${props.reddit.q}"`
+            : ""
+        }
+      />
+    );
   } else {
     return (
       <PostsContainer
