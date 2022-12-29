@@ -80,3 +80,7 @@ export const OutlineBtnStyle = styled(BtnStyle)`
   --btn-focus-box-shadow: 0px 0px 0px 3px
     hsla(209.88235294117646, 100%, 50%, 0.4);
 `;
+
+export const PlainBtnStyle = styled(OutlineBtnStyle)`
+  border: 1px solid transparent;
+`;

@@ -12,6 +12,7 @@ import {
   SubmitBtnStyle,
 } from "./styles/auth.style";
 import { InputStyle } from "./styles/form.style";
+import { AuthDialogStyle } from "./styles/PageHeader.style";
 
 type AuthType = "LOG_IN" | "SING_UP";
 type AuthFn = (key: string, pass: string) => boolean;
@@ -50,7 +51,7 @@ function Auth({
   }, [open]);
 
   return (
-    <dialog open={open} aria-labelledby="dig-title" style={opacity}>
+    <AuthDialogStyle open={open} aria-labelledby="dig-title" style={opacity}>
       <DialogHeaderStyle>
         {title}
         <CloseBtnStyle
@@ -71,7 +72,7 @@ function Auth({
           <OutputStyle htmlFor="user-submit-btn">{output}</OutputStyle>
         </div>
       </DialogFormStyle>
-    </dialog>
+    </AuthDialogStyle>
   );
 }
 

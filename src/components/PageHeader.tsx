@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ThreeBars } from "./icons";
+import { MagnifyingGlass, ThreeBars } from "./icons";
 import {
   IconBtnStyle,
   OutlineBtnStyle,
+  PlainBtnStyle,
   PrimaryBtnStyle,
 } from "./styles/button.style";
 import {
@@ -80,7 +81,9 @@ function LeftBlock(props: { toggleNav: () => void }) {
 function HeadButtons({ toggleSearch }: { toggleSearch: () => void }) {
   return (
     <AuthButtonsStyle>
-      <SearchBtnStyle onClick={toggleSearch}>search</SearchBtnStyle>
+      <SearchBtnStyle aria-label="open search" onClick={toggleSearch}>
+        <MagnifyingGlass />
+      </SearchBtnStyle>
       {isLoggedIn() ? (
         <LogOut />
       ) : (
@@ -98,9 +101,7 @@ function LogInBtn() {
 
   return (
     <>
-      <OutlineBtnStyle onClick={() => setOpenDig(!openDig)}>
-        log in
-      </OutlineBtnStyle>
+      <PlainBtnStyle onClick={() => setOpenDig(!openDig)}>log in</PlainBtnStyle>
       <LogInDialog key={Math.random()} open={openDig} setOpen={setOpenDig} />
     </>
   );

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { OutlineBtnStyle } from "./button.style";
+import { IconBtnStyle, OutlineBtnStyle } from "./button.style";
 
 export const PageHeaderStyle = styled.header`
   background-color: var(--bg-color);
@@ -27,9 +27,24 @@ export const LeftBlockStyle = styled.div`
   & > h1 {
     margin: 0;
   }
+
+  @media (max-width: 32rem) {
+    gap: 0.5rem;
+  }
+
+  & > h1 {
+    margin: 0;
+  }
+
+  @media (max-width: 21rem) {
+    & > h1 {
+      display: none;
+    }
+  }
 `;
 
 export const AuthButtonsStyle = styled.div`
+  align-items: center;
   display: flex;
   gap: 6px;
 `;
@@ -55,8 +70,12 @@ export const SearchForm = styled.form`
 `;
 
 // temporary until a find a nice icon
-export const SearchBtnStyle = styled(OutlineBtnStyle)`
+export const SearchBtnStyle = styled(IconBtnStyle)`
   @media (min-width: 44rem) {
     display: none;
   }
+`;
+
+export const AuthDialogStyle = styled.dialog`
+  top: calc(100% + 1rem);
 `;
