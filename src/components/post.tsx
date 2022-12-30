@@ -66,6 +66,7 @@ function PostMediaContent(props: { video?: MediaVideo; images?: Media[] }) {
     return (
       <div>
         <ImgStyle
+          alt="Post image"
           srcSet={getScrSet(props.images)}
           sizes="(max-width: 43rem) 85vw, 39rem"
           height={image.height}

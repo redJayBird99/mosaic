@@ -7,11 +7,10 @@ import {
   DialogFormStyle,
   DialogHeaderStyle,
   DialogTitleStyle,
-  HideLabelStyle,
   OutputStyle,
   SubmitBtnStyle,
 } from "./styles/auth.style";
-import { InputStyle } from "./styles/form.style";
+import { InputStyle, HideLabelStyle } from "./styles/form.style";
 import { AuthDialogStyle } from "./styles/PageHeader.style";
 
 type AuthType = "LOG_IN" | "SING_UP";
@@ -51,7 +50,11 @@ function Auth({
   }, [open]);
 
   return (
-    <AuthDialogStyle open={open} aria-labelledby="dig-title" style={opacity}>
+    <AuthDialogStyle
+      open={open}
+      aria-labelledby={title.props.id}
+      style={opacity}
+    >
       <DialogHeaderStyle>
         {title}
         <CloseBtnStyle
@@ -63,8 +66,8 @@ function Auth({
         </CloseBtnStyle>
       </DialogHeaderStyle>
       <DialogFormStyle onSubmit={onSubmit}>
-        <NameInput authType={type} />
-        <PasswordInput />
+        <NameInput authType={type} id={type + "name"} />
+        <PasswordInput id={type + "pass"} />
         <div>
           <SubmitBtnStyle onBlur={() => setOutput("")} id="user-submit-btn">
             Submit
@@ -76,7 +79,7 @@ function Auth({
   );
 }
 
-function NameInput({ authType }: { authType: AuthType }) {
+function NameInput({ authType, id }: { authType: AuthType } & { id: string }) {
   const [value, setValue] = useState("");
   const [output, setOutput] = useState("");
   const onBlur = (v: string) => {
@@ -91,10 +94,10 @@ function NameInput({ authType }: { authType: AuthType }) {
 
   return (
     <div>
-      <HideLabelStyle htmlFor="user-name">User Name</HideLabelStyle>
+      <HideLabelStyle htmlFor={id}>User Name</HideLabelStyle>
       <InputStyle
         className={output !== "" ? "invalid" : ""}
-        id="user-name"
+        id={id}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onBlur={(e) => onBlur(e.target.value)}
@@ -110,7 +113,7 @@ function NameInput({ authType }: { authType: AuthType }) {
   );
 }
 
-function PasswordInput() {
+function PasswordInput({ id }: { id: string }) {
   const [value, setValue] = useState("");
   const [output, setOutput] = useState("");
   const onBlur = (value: string) => {
@@ -125,9 +128,9 @@ function PasswordInput() {
 
   return (
     <div>
-      <HideLabelStyle htmlFor="user-pass">User Password</HideLabelStyle>
+      <HideLabelStyle htmlFor={id}>User Password</HideLabelStyle>
       <InputStyle
-        id="user-pass"
+        id={id}
         className={output !== "" ? "invalid" : ""}
         value={value}
         onChange={(e) => setValue(e.target.value)}
@@ -148,7 +151,7 @@ export function LogInDialog({ open, setOpen }: DigControl) {
   return (
     <Auth
       auth={logIn}
-      title={<DialogTitleStyle id="dig-title">Log in</DialogTitleStyle>}
+      title={<DialogTitleStyle id="dig-title-log">Log in</DialogTitleStyle>}
       open={open}
       setOpen={setOpen}
       type="LOG_IN"
@@ -160,7 +163,7 @@ export function SignUpDialog({ open, setOpen }: DigControl) {
   return (
     <Auth
       auth={signUp}
-      title={<DialogTitleStyle id="dig-title">Sign up</DialogTitleStyle>}
+      title={<DialogTitleStyle id="dig-title-sign">Sign up</DialogTitleStyle>}
       open={open}
       setOpen={setOpen}
       type="SING_UP"

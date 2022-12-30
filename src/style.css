@@ -12,11 +12,11 @@
   --on-bg-color-700: hsl(0, 0%, 20%);
   --on-bg-color-600: hsl(0, 0%, 30%);
 
-  --primary-color: hsl(210, 100%, 50%);
+  --primary-color: hsl(210, 100%, 45%);
   --primary-color-400: hsl(210, 100%, 60%);
   --primary-color-600: hsl(210, 100%, 40%);
   --primary-color-650: hsl(210, 100%, 35%);
-  --secondary-color: orangered;
+  --secondary-color: rgb(199, 46, 0);
 
   --error-color: #e32636;
 
@@ -31,8 +31,7 @@
 
 body {
   background-color: var(--bg-color-100);
-  font-family: "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-    "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family: "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;

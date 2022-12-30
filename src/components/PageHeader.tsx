@@ -16,7 +16,11 @@ import {
   SearchForm,
 } from "./styles/PageHeader.style";
 import { Search as SearchIcon } from "./icons";
-import { InputGroupControlStyle, InputGroupStyle } from "./styles/form.style";
+import {
+  HideLabelStyle,
+  InputGroupControlStyle,
+  InputGroupStyle,
+} from "./styles/form.style";
 import { LogInDialog, SignUpDialog } from "./auth";
 import { isLoggedIn, logOut } from "../util/account";
 
@@ -55,12 +59,14 @@ function Search({ open }: { open: boolean }) {
 
   return (
     <SearchForm className={open ? "open" : ""} onSubmit={onSummit} id="search">
+      <HideLabelStyle htmlFor="search-input">Search term</HideLabelStyle>
       <InputGroupStyle>
         <SearchIcon />
         <InputGroupControlStyle
           name="search"
           type="search"
           placeholder="Search"
+          id="search-input"
         />
       </InputGroupStyle>
     </SearchForm>
@@ -70,7 +76,10 @@ function Search({ open }: { open: boolean }) {
 function LeftBlock(props: { toggleNav: () => void }) {
   return (
     <LeftBlockStyle>
-      <IconBtnStyle onClick={props.toggleNav}>
+      <IconBtnStyle
+        aria-label="toggle navigation menu"
+        onClick={props.toggleNav}
+      >
         <ThreeBars />
       </IconBtnStyle>
       <h1>Mosaic</h1>

@@ -1,4 +1,11 @@
-import { ChangeEvent, useEffect, useReducer, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { Outlet, useParams, useSearchParams } from "react-router-dom";
 import {
   Content,
@@ -110,7 +117,6 @@ function SearchControls(q: Query, onChange: (k: keyof Query) => HandleChange) {
 
 function Listing() {
   const listing = useParams().listing ?? "best";
-  console.log("__love__", listing);
 
   if (!listings.includes(listing)) {
     return <MainNotFound />;
@@ -227,7 +233,7 @@ function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
 
   if (state.error) {
     // TODO
-    return <div>Error was occurred</div>;
+    return <NotFound text={"Sorry, unfortunately something went wrong"} />;
   } else if (state.end && state.c.length === 0) {
     return (
       <NotFound

@@ -27,11 +27,6 @@ export const DialogFormStyle = styled.form`
   width: 20rem;
 `;
 
-export const HideLabelStyle = styled.label`
-  position: absolute;
-  left: -999rem;
-`;
-
 export const OutputStyle = styled.output`
   display: block;
   color: var(--error-color);

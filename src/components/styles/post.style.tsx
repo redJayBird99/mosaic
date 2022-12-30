@@ -57,6 +57,7 @@ export const ImgStyle = styled.img`
 export const PostCtnrInfoStyle = styled.div`
   color: var(--on-bg-color-600);
   font-size: 0.9rem;
+  font-style: italic;
   padding: 0 3px 0 0.5rem;
 `;
 
