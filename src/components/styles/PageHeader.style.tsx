@@ -79,3 +79,7 @@ export const SearchBtnStyle = styled(IconBtnStyle)`
 export const AuthDialogStyle = styled.dialog`
   top: calc(100% + 1rem);
 `;
+
+export const NavOpenBtn = styled(IconBtnStyle)`
+  width: 32px;
+`;

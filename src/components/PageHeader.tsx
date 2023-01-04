@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MagnifyingGlass, ThreeBars } from "./icons";
+import { Close, MagnifyingGlass, ThreeBars } from "./icons";
 import {
   IconBtnStyle,
   OutlineBtnStyle,
@@ -11,6 +11,7 @@ import {
   AuthButtonsStyle,
   HeaderBarStyle,
   LeftBlockStyle,
+  NavOpenBtn,
   PageHeaderStyle,
   SearchBtnStyle,
   SearchForm,
@@ -24,14 +25,14 @@ import {
 import { LogInDialog, SignUpDialog } from "./auth";
 import { isLoggedIn, logOut } from "../util/account";
 
-export function PageHeader(props: { toggleNav: () => void }) {
+export function PageHeader(props: { toggleNav: () => void; navOpen: boolean }) {
   // it only effect small screen, on big screen it is always open
   const [openSearch, setOpenSearch] = useState(false);
 
   return (
     <PageHeaderStyle>
       <HeaderBarStyle>
-        <LeftBlock toggleNav={props.toggleNav} />
+        <LeftBlock toggleNav={props.toggleNav} open={props.navOpen} />
         <Search open={openSearch} />
         <HeadButtons toggleSearch={() => setOpenSearch((open) => !open)} />
       </HeaderBarStyle>
@@ -73,15 +74,12 @@ function Search({ open }: { open: boolean }) {
   );
 }
 
-function LeftBlock(props: { toggleNav: () => void }) {
+function LeftBlock(props: { toggleNav: () => void; open: boolean }) {
   return (
     <LeftBlockStyle>
-      <IconBtnStyle
-        aria-label="toggle navigation menu"
-        onClick={props.toggleNav}
-      >
-        <ThreeBars />
-      </IconBtnStyle>
+      <NavOpenBtn aria-label="toggle navigation menu" onClick={props.toggleNav}>
+        {props.open ? <Close /> : <ThreeBars />}
+      </NavOpenBtn>
       <h1>Mosaic</h1>
     </LeftBlockStyle>
   );

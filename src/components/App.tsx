@@ -6,7 +6,12 @@ import {
   useRef,
   useState,
 } from "react";
-import { Outlet, useParams, useSearchParams } from "react-router-dom";
+import {
+  Outlet,
+  useLocation,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import {
   Content,
   listingContent,
@@ -35,13 +40,22 @@ export const mainRoutes = [
 ];
 
 export function Layout({ main }: { main: JSX.Element }) {
-  const [nav, setNav] = useState(false);
-  const toggleNav = () => setNav((nav) => !nav);
+  const [navOpen, setNavOpen] = useState(false);
+  const l = useLocation();
+  const [oldPath, setOldPath] = useState(l.pathname);
+
+  if (oldPath !== l.pathname) {
+    setOldPath(l.pathname);
+    setNavOpen(false);
+  }
 
   return (
     <>
-      <PageHeader toggleNav={toggleNav}></PageHeader>
-      <NavBar open={nav} />
+      <PageHeader
+        navOpen={navOpen}
+        toggleNav={() => setNavOpen((nav) => !nav)}
+      ></PageHeader>
+      <NavBar open={navOpen} />
       {main}
     </>
   );
