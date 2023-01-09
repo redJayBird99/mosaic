@@ -6,10 +6,13 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 const root = document.createElement("div");
 document.body.append(root);
-const router = createBrowserRouter([
-  { path: "/", element: <App />, children: mainRoutes },
-  { path: "*", element: <Page404 /> },
-]);
+const router = createBrowserRouter(
+  [
+    { path: "/", element: <App />, children: mainRoutes },
+    { path: "*", element: <Page404 /> },
+  ],
+  { basename: "/mosaic/" }
+);
 
 createRoot(root).render(
   <React.StrictMode>
