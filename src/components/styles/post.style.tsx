@@ -94,9 +94,16 @@ export const CtnrVotesStyle = styled.div`
 `;
 
 export const ScoreStyle = styled.div`
+  align-items: center;
   color: var(--secondary-color);
+  display: flex;
   font-weight: bold;
   white-space: nowrap;
+`;
+
+export const ArrowStyle = styled.span`
+  filter: invert(21%) sepia(31%) saturate(6450%) hue-rotate(6deg)
+    brightness(100%) contrast(103%);
 `;
 
 export const ControlsStyle = styled.menu`

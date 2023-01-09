@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Content, Media, MediaVideo } from "../reddit/reddit";
-import { Flag, Save, Share } from "./icons";
+import { Flag, Save, Share, UpArrow } from "./icons";
 import { IconBtnGlowStyle } from "./styles/button.style";
 import {
+  ArrowStyle,
   ControlsStyle,
   CtnrVotesStyle,
   ImgStyle,
@@ -135,11 +136,14 @@ function getScrSet(images: Media[]) {
 
 function PostLeftSide({ c }: { c: Content }) {
   const sc = c.score > 1000 ? `${Math.round(c.score / 1000)}k` : c.score;
-  const arrow = c.score > 0 ? "ᐃ " : "ᐁ ";
+  const arrow = c.score > 0 ? <UpArrow /> : "ᐁ ";
   return (
     <LeftBarStyle>
       <CtnrVotesStyle>
-        <ScoreStyle title="votes">{arrow + sc}</ScoreStyle>
+        <ScoreStyle title="votes">
+          <ArrowStyle>{arrow}</ArrowStyle>
+          {" " + sc}
+        </ScoreStyle>
         <div title="vote ratio" className="small-tx">
           {Math.round(c.voteRatio * 100)}% ratio
         </div>
