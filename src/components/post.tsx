@@ -17,7 +17,8 @@ import {
   ScoreStyle,
   VideoStyle,
 } from "./styles/post.style";
-import dashjs from "dashjs";
+/** @ts-ignore */
+import shaka from "shaka-player/dist/shaka-player.compiled";
 import { timeSince } from "../util/util";
 import mGlass from "../asset/magnifying-glass.png";
 import {
@@ -80,6 +81,23 @@ function PostMediaContent(props: { video?: MediaVideo; images?: Media[] }) {
   return <div>sorry there isn't any content</div>;
 }
 
+let shakaState = { init: false, ready: false };
+
+function isShakaReady() {
+  if (shakaState.init) {
+    return shakaState.ready;
+  }
+
+  shakaState.init = true;
+  shaka.polyfill.installAll();
+
+  if (shaka.Player.isBrowserSupported()) {
+    return (shakaState.ready = true);
+  } else {
+    return (shakaState.ready = false);
+  }
+}
+
 function Video({ v }: { v: MediaVideo }) {
   var videoRef = useRef<HTMLVideoElement>(null);
   function fallback() {
@@ -91,26 +109,49 @@ function Video({ v }: { v: MediaVideo }) {
   }
 
   useEffect(() => {
-    if (dashjs.supportsMediaSource()) {
-      try {
-        const player = dashjs.MediaPlayer().create();
-        player.updateSettings({
-          streaming: {
-            scheduling: {
-              scheduleWhilePaused: false,
+    let player: undefined | typeof shaka.Player;
+
+    async function initPlayer() {
+      if (isShakaReady()) {
+        try {
+          player = new shaka.Player(videoRef.current!);
+          player.configure({
+            manifest: {
+              dash: {
+                ignoreMinBufferTime: true,
+              },
             },
-          },
-        });
-        player.initialize(videoRef.current!, videoRef.current!.src, false);
-        return () => {
-          player.destroy();
-        };
-      } catch (e) {
+            streaming: {
+              rebufferingGoal: 0,
+              bufferingGoal: 0,
+            },
+          });
+          await player.load(videoRef.current!.src);
+          videoRef.current!.onplay = () => {
+            player.configure({
+              streaming: {
+                rebufferingGoal: undefined,
+                bufferingGoal: undefined,
+              },
+            });
+          };
+          // await player.load(videoRef.current!.src);
+        } catch (e) {
+          console.error(`TODO: ${e}`);
+        }
+      } else {
         fallback();
       }
-    } else {
-      fallback();
     }
+
+    initPlayer();
+    return () => {
+      player?.destroy();
+
+      if (videoRef.current?.onplay) {
+        videoRef.current.onplay = null;
+      }
+    };
   }, []);
 
   // set maxHeight manually because of this bug https://stackoverflow.com/questions/14554908/imgs-max-height-not-respecting-parents-dimensions
