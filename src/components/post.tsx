@@ -17,8 +17,6 @@ import {
   ScoreStyle,
   VideoStyle,
 } from "./styles/post.style";
-/** @ts-ignore */
-import shaka from "shaka-player/dist/shaka-player.compiled";
 import { timeSince } from "../util/util";
 import mGlass from "../asset/magnifying-glass.png";
 import {
@@ -27,6 +25,7 @@ import {
   getHistory,
   UserHistory,
 } from "../util/history";
+import { getShaka } from "../shaka-player";
 
 /** container for a listing reddit post, render the post content, infos and user post controls */
 export function Post({ c }: { c: Content }) {
@@ -109,42 +108,32 @@ function Video({ v }: { v: MediaVideo }) {
   }
 
   useEffect(() => {
-    let player: undefined | typeof shaka.Player;
+    let player: any;
+    let loaded = false;
 
-    async function initPlayer() {
-      if (isShakaReady()) {
+    videoRef.current!.onplay = async () => {
+      // when video start for the first time remove the placeholder and load the actual video with the shaka player
+      if (!loaded) {
+        loaded = true;
+        videoRef.current!.pause();
+
         try {
-          player = new shaka.Player(videoRef.current!);
-          player.configure({
-            manifest: {
-              dash: {
-                ignoreMinBufferTime: true,
-              },
-            },
-            streaming: {
-              rebufferingGoal: 0,
-              bufferingGoal: 0,
-            },
-          });
-          await player.load(videoRef.current!.src);
-          videoRef.current!.onplay = () => {
-            player.configure({
-              streaming: {
-                rebufferingGoal: undefined,
-                bufferingGoal: undefined,
-              },
-            });
-          };
-          // await player.load(videoRef.current!.src);
+          const { shakaApi, available } = await getShaka();
+          player = new shakaApi.Player(videoRef.current!);
+
+          if (available) {
+            await player.load(v.url);
+          } else {
+            fallback();
+          }
         } catch (e) {
           console.error(`TODO: ${e}`);
         }
-      } else {
-        fallback();
-      }
-    }
 
-    initPlayer();
+        videoRef.current!.play();
+      }
+    };
+
     return () => {
       player?.destroy();
 
@@ -159,13 +148,13 @@ function Video({ v }: { v: MediaVideo }) {
   return (
     <VideoStyle
       ref={videoRef}
-      preload="metadata"
+      preload="none"
       poster={v.poster}
       style={{
         maxHeight: `${v.height > 600 ? 600 : v.height}px`,
         aspectRatio: `${v.width / v.height}`,
       }}
-      src={v.url}
+      src="https://cdn.videvo.net/videvo_files/video/premium/video0449/large_watermarked/295 - Animated Horizontal Brush Strokes Pack_663_Brush_13_preview.mp4"
       controls
     />
   );
