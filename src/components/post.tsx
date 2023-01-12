@@ -131,7 +131,7 @@ function Video({ v }: { v: MediaVideo }) {
           console.error(`TODO: ${e}`);
         }
 
-        videoRef.current!.play();
+        videoRef.current!.play().then(undefined, (e) => console.log("TODO", e));
       }
     };
 
