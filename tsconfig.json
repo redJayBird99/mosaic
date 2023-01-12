@@ -3,7 +3,6 @@
     "outDir": "./dist/",
     "strict": true,
     "sourceMap": true,
-    "removeComments": true,
     "module": "es2022",
     "target": "es2020",
     "moduleResolution": "node",

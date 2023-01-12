@@ -1,3 +1,6 @@
+// @ts-nocheck
+// it seams that shaka doesn't have type declaration
+
 let available = false;
 let installed = false;
 
@@ -5,9 +8,13 @@ export async function getShaka(): Promise<{
   shakaApi: any;
   available: boolean;
 }> {
-  /** @ts-ignore */
-  const shakaApi = (await import("shaka-player/dist/shaka-player.compiled"))
-    .default;
+  const shakaApi = (
+    await import(
+      /* webpackChunkName: "shaka" */
+      /* webpackPrefetch: true */
+      "shaka-player/dist/shaka-player.compiled"
+    )
+  ).default;
 
   if (!installed) {
     installed = true;

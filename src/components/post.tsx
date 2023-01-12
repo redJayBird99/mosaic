@@ -26,6 +26,7 @@ import {
   UserHistory,
 } from "../util/history";
 import { getShaka } from "../shaka-player";
+import blankVideo from "../asset/blank.mp4";
 
 /** container for a listing reddit post, render the post content, infos and user post controls */
 export function Post({ c }: { c: Content }) {
@@ -154,7 +155,7 @@ function Video({ v }: { v: MediaVideo }) {
         maxHeight: `${v.height > 600 ? 600 : v.height}px`,
         aspectRatio: `${v.width / v.height}`,
       }}
-      src="https://cdn.videvo.net/videvo_files/video/premium/video0449/large_watermarked/295 - Animated Horizontal Brush Strokes Pack_663_Brush_13_preview.mp4"
+      src={blankVideo}
       controls
     />
   );
