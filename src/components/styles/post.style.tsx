@@ -130,4 +130,8 @@ export const NotFoundStyle = styled.div`
   justify-content: center;
   min-height: calc(100vh - var(--header-height));
   text-align: center;
+
+  & > h3 {
+    padding: 0 0.5rem;
+  }
 `;

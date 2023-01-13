@@ -208,7 +208,7 @@ function useRedditApi(reddit: ContentBatch): [FetcherState, () => void] {
 
     try {
       batch = await reddit.getBatch();
-    } catch (e) {
+    } catch (e: any) {
       // TODO: add some info
       dispatch({ type: "FETCH_ERROR" });
       stopLoading();
@@ -246,8 +246,13 @@ function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
   }, [props.reddit]);
 
   if (state.error) {
-    // TODO
-    return <NotFound text={"Sorry, unfortunately something went wrong"} />;
+    return (
+      <NotFound
+        text={
+          "Sorry, unfortunately something went wrong. usually the problem could be that external requests to the Reddit api were blocked by some extension (like DuckDuckGo privacy, abs Block and etc) or some stricter browser privacy setting."
+        }
+      />
+    );
   } else if (state.end && state.c.length === 0) {
     return (
       <NotFound
