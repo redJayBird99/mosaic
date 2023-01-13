@@ -132,6 +132,7 @@ export const NotFoundStyle = styled.div`
   text-align: center;
 
   & > h3 {
+    max-width: 65ch;
     padding: 0 0.5rem;
   }
 `;
