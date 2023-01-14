@@ -98,6 +98,8 @@ class RemoteBatch implements ContentBatch {
   private fetching = false;
   // true there are no more remote content to fetch
   private remoteEnd = false;
+  // keep track if there already a client waiting to resolve a request
+  private clientWaiting = false;
 
   /** the fetcher is responsible for the specific reddit api request, while this class keep track of position */
   constructor(
@@ -105,15 +107,16 @@ class RemoteBatch implements ContentBatch {
     public q: string
   ) {}
 
-  /** get around the next 10 media content to show, from the reddit api (some duplicate is possible),
-   * multiple called while it is already fetching are ignore,
-   * @Returns an array of content and a flag indicating if there is more content available
+  /** fetch and store the content from the reddit api, multiple called while it is already fetching are ignore.
+   * it keep making request until a threshold buffer is reached (so we can amortize the fetching delay cost)
    */
-  async getBatch(): Promise<Batch> {
-    if (!this.remoteEnd && !this.fetching && this.buff.length === 0) {
+  async fetch() {
+    const fetchSize = 30;
+
+    if (!this.remoteEnd && !this.fetching && this.buff.length <= 25) {
       this.fetching = true;
       const json = await this.fetcher({
-        limit: 30,
+        limit: fetchSize,
         count: this.count,
         after: this.after,
       });
@@ -123,16 +126,34 @@ class RemoteBatch implements ContentBatch {
         this.remoteEnd = true;
       }
 
-      this.buff = json.data.children
-        .map((r: JsonRes) => toMediaContent(r.data))
-        .filter((r: Content | undefined) => {
-          if (r && !this.fetched.has(r.id)) {
-            this.fetched.add(r.id);
-            return true;
-          }
-        });
+      this.buff.push(
+        ...json.data.children
+          .map((r: JsonRes) => toMediaContent(r.data))
+          .filter((r: Content | undefined) => {
+            if (r && !this.fetched.has(r.id)) {
+              this.fetched.add(r.id);
+              return true;
+            }
+          })
+      );
       this.after = json.data.after;
-      this.count += 30;
+      this.count += fetchSize;
+      this.fetch();
+    }
+  }
+
+  /** get around the next 10 media content to show, from the reddit api (some duplicate is possible),
+   * multiple called while it is already fetching are ignore,
+   * @Returns an array of content and a flag indicating if there is more content available
+   */
+  async getBatch(): Promise<Batch> {
+    // there is no need to resolve multiple request if the fetching is pending
+    if (!this.clientWaiting && this.buff.length === 0) {
+      this.clientWaiting = true;
+      await this.fetch();
+      this.clientWaiting = false;
+    } else {
+      this.fetch();
     }
 
     const batch = this.buff.splice(
