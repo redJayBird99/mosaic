@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useId, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { hasAccount, logIn, signUp } from "../util/account";
 import { Close } from "./icons";
@@ -27,6 +27,8 @@ function Auth({
   const navigate = useNavigate();
   const [opacity, setOpacity] = useState({ opacity: 0 });
   const [output, setOutput] = useState("");
+  const btnId = useId();
+
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget as HTMLFormElement;
@@ -69,10 +71,10 @@ function Auth({
         <NameInput authType={type} id={type + "name"} />
         <PasswordInput id={type + "pass"} />
         <div>
-          <SubmitBtnStyle onBlur={() => setOutput("")} id="user-submit-btn">
+          <SubmitBtnStyle onBlur={() => setOutput("")} id={btnId}>
             Submit
           </SubmitBtnStyle>
-          <OutputStyle htmlFor="user-submit-btn">{output}</OutputStyle>
+          <OutputStyle htmlFor={btnId}>{output}</OutputStyle>
         </div>
       </DialogFormStyle>
     </AuthDialogStyle>
@@ -97,6 +99,7 @@ function NameInput({ authType, id }: { authType: AuthType } & { id: string }) {
       <HideLabelStyle htmlFor={id}>User Name</HideLabelStyle>
       <InputStyle
         className={output !== "" ? "invalid" : ""}
+        autoComplete="username"
         id={id}
         value={value}
         onChange={(e) => setValue(e.target.value)}
@@ -132,6 +135,7 @@ function PasswordInput({ id }: { id: string }) {
       <InputStyle
         id={id}
         className={output !== "" ? "invalid" : ""}
+        autoComplete="current-password"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onBlur={(e) => onBlur(e.target.value)}
