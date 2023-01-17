@@ -94,7 +94,7 @@ export const CtnrVotesStyle = styled.div`
 `;
 
 export const ScoreStyle = styled.div`
-  align-items: center;
+  align-items: baseline;
   color: var(--secondary-color);
   display: flex;
   font-weight: bold;
