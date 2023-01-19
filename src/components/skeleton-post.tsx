@@ -8,10 +8,10 @@ export function SkeletonPost() {
   return (
     <SkeletonPostStyle>
       <div>
-        <SkeletonLineStyle />
-        <SkeletonLineStyle />
+        <SkeletonLineStyle className="skeleton-animate" />
+        <SkeletonLineStyle className="skeleton-animate" />
       </div>
-      <SkeletonMediaStyle />
+      <SkeletonMediaStyle className="skeleton-animate" />
     </SkeletonPostStyle>
   );
 }

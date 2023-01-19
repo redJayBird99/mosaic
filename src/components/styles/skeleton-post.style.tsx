@@ -5,20 +5,9 @@ export const SkeletonPostStyle = styled(PostStyle)`
   display: block;
   border-radius: 5px;
   padding: 1rem;
-
-  @keyframes wait-anime {
-    from {
-      background-color: var(--on-bg-color-600);
-    }
-
-    to {
-      background-color: var(--bg-color-200);
-    }
-  }
 `;
 
 export const SkeletonLineStyle = styled.div`
-  animation: wait-anime 1s linear infinite alternate;
   border-radius: 4px;
   height: 0.7rem;
   margin: 0.3rem 0;
@@ -29,7 +18,6 @@ export const SkeletonLineStyle = styled.div`
 `;
 
 export const SkeletonMediaStyle = styled.div`
-  animation: wait-anime 1s linear infinite alternate;
   height: 400px;
   margin: 1rem 0;
 `;

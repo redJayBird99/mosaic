@@ -83,3 +83,26 @@ dialog {
   box-shadow: 0px 1px 3px 0px hsla(0, 0%, 5%, 0.2);
   transition: opacity 0.2s linear;
 }
+
+@keyframes skeleton-wait {
+  from {
+    background-color: var(--on-bg-color-600);
+  }
+
+  to {
+    background-color: var(--bg-color-200);
+  }
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.skeleton-animate {
+  animation: skeleton-wait 1s linear infinite alternate;
+}

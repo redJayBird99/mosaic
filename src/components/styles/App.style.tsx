@@ -27,15 +27,6 @@ export const LoadingWindowStyle = styled.div`
 `;
 
 export const LoadingRingStyle = styled.div`
-  @keyframes rotation {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-
   display: inline-block;
   height: 80px;
   left: calc(50% - 40px);
