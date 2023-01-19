@@ -1,14 +1,65 @@
-import React, { useLayoutEffect, useRef } from "react";
-import { Content } from "../reddit/reddit";
-import { Post } from "./post";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
+import { Content, ContentBatch } from "../reddit/reddit";
+import { NotFound, Post } from "./post";
 import { SkeletonPost } from "./skeleton-post";
 import {
   CtnrPostsStyle,
   LoadingRingStyle,
   LoadingWindowStyle,
 } from "./styles/App.style";
+import { useRedditApi } from "./use-reddit";
 
-export class PostsContainer extends React.PureComponent<
+/** render the posts from the given content fetcher, or fallback component (error or not found) */
+export function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
+  const [state, fetchContent] = useRedditApi(props.reddit);
+  // we don't need to update it, because when ContentBatch change the entire
+  // component is rebuild from scratch on every navigation, although it still initial and ignored currently
+  const obsRef = useRef(
+    new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          fetchContent();
+        }
+      });
+    })
+  );
+
+  useEffect(() => {
+    fetchContent();
+  }, [props.reddit]);
+
+  if (state.error) {
+    return (
+      <NotFound
+        text={
+          "Sorry, unfortunately something went wrong. usually the problem could be that external requests to the Reddit api were blocked by some extension (like DuckDuckGo privacy, abs Block and etc) or some stricter browser privacy setting."
+        }
+      />
+    );
+  } else if (state.end && state.c.length === 0) {
+    return (
+      <NotFound
+        text={
+          props.reddit.q
+            ? `Sorry, we couldn't find any results for "${props.reddit.q}"`
+            : ""
+        }
+      />
+    );
+  } else {
+    return (
+      <PostsContainer
+        c={state.c}
+        obs={obsRef.current}
+        loading={state.loading}
+        end={state.end}
+        Controls={props.Controls}
+      />
+    );
+  }
+}
+
+class PostsContainer extends React.PureComponent<
   {
     c: Content[];
     obs: IntersectionObserver;
