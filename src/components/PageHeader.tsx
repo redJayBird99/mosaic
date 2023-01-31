@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Close, MagnifyingGlass, ThreeBars } from "./icons";
 import {
-  IconBtnStyle,
   OutlineBtnStyle,
   PlainBtnStyle,
   PrimaryBtnStyle,

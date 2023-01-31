@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   font-size: clamp(13px, 2vw, 16px);
   line-height: 1.4;
