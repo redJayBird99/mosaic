@@ -13,10 +13,11 @@
   --bg-color-250: hsl(0, 0%, 75%);
   --bg-color-300: hsl(0, 0%, 70%);
   --on-bg-color: hsl(0, 0%, 5%);
+
   --on-bg-color-700: hsl(0, 0%, 20%);
   --on-bg-color-600: hsl(0, 0%, 30%);
 
-  --primary-color: hsl(210, 100%, 45%);
+  --primary-color: #0073e6;
   --primary-color-400: hsl(210, 100%, 60%);
   --primary-color-600: hsl(210, 100%, 40%);
   --primary-color-650: hsl(210, 100%, 35%);
@@ -109,4 +110,57 @@ dialog {
 
 .skeleton-animate {
   animation: skeleton-wait 1s linear infinite alternate;
+}
+
+.bg-color {
+  background-color: var(--bg-color);
+}
+
+.h-header {
+  height: var(--header-height);
+}
+
+.p-header {
+  padding: 0 clamp(0.5rem, 2%, 1rem);
+}
+
+.hide {
+  position: absolute;
+  left: -999rem;
+}
+
+@media (max-width: 21rem) {
+  .title-hidden {
+    display: none;
+  }
+}
+
+@layer components {
+  .icon-btn {
+    @apply bg-transparent border border-solid border-transparent rounded-md inline-block cursor-pointer py-0.5 px-1 text-center transition-all outline-none focus-visible:ring-blue-200 focus-visible:ring-4 focus-visible:border focus-visible:border-blue-200 focus-visible:border-solid;
+  }
+
+  .inputGroup {
+    @apply items-stretch bg-transparent rounded-xl border border-solid border-slate-300 shadow-inner flex py-1 px-2 transition-all focus-within:border-blue-200 focus-within:text-onBg-600 focus-within:ring-4 focus-within:ring-blue-200;
+  }
+}
+
+@media (max-width: 44rem) {
+  .search-form {
+    background-color: var(--bg-color);
+    box-shadow: 0px 2px 2px -1px hsl(0, 0%, 10%, 0.15);
+    visibility: hidden;
+    left: 0;
+    opacity: 0;
+    padding: 0 1rem 4px 1rem;
+    position: absolute;
+    top: 100%;
+    transition: all 0.3s linear;
+    width: 100%;
+  }
+
+  .search-open {
+    visibility: visible;
+    opacity: 1;
+  }
 }

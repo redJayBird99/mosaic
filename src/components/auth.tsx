@@ -10,7 +10,7 @@ import {
   OutputStyle,
   SubmitBtnStyle,
 } from "./styles/auth.style";
-import { InputStyle, HideLabelStyle } from "./styles/form.style";
+import { InputStyle } from "./styles/form.style";
 import { AuthDialogStyle } from "./styles/PageHeader.style";
 
 type AuthType = "LOG_IN" | "SING_UP";
@@ -96,7 +96,9 @@ function NameInput({ authType, id }: { authType: AuthType } & { id: string }) {
 
   return (
     <div>
-      <HideLabelStyle htmlFor={id}>User Name</HideLabelStyle>
+      <label className="hide" htmlFor={id}>
+        User Name
+      </label>
       <InputStyle
         className={output !== "" ? "invalid" : ""}
         autoComplete="username"
@@ -131,7 +133,9 @@ function PasswordInput({ id }: { id: string }) {
 
   return (
     <div>
-      <HideLabelStyle htmlFor={id}>User Password</HideLabelStyle>
+      <label className="hide" htmlFor={id}>
+        User Password
+      </label>
       <InputStyle
         id={id}
         className={output !== "" ? "invalid" : ""}

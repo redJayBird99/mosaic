@@ -6,21 +6,7 @@ import {
   PlainBtnStyle,
   PrimaryBtnStyle,
 } from "./styles/button.style";
-import {
-  AuthButtonsStyle,
-  HeaderBarStyle,
-  LeftBlockStyle,
-  NavOpenBtn,
-  PageHeaderStyle,
-  SearchBtnStyle,
-  SearchForm,
-} from "./styles/PageHeader.style";
 import { Search as SearchIcon } from "./icons";
-import {
-  HideLabelStyle,
-  InputGroupControlStyle,
-  InputGroupStyle,
-} from "./styles/form.style";
 import { LogInDialog, SignUpDialog } from "./auth";
 import { isLoggedIn, logOut } from "../util/account";
 
@@ -29,13 +15,13 @@ export function PageHeader(props: { toggleNav: () => void; navOpen: boolean }) {
   const [openSearch, setOpenSearch] = useState(false);
 
   return (
-    <PageHeaderStyle>
-      <HeaderBarStyle>
+    <header className="bg-color border-b border-solid border-gray-300 shadow sticky z-10 top-0">
+      <div className="flex items-center h-header justify-between m-auto p-header">
         <LeftBlock toggleNav={props.toggleNav} open={props.navOpen} />
         <Search open={openSearch} />
         <HeadButtons toggleSearch={() => setOpenSearch((open) => !open)} />
-      </HeaderBarStyle>
-    </PageHeaderStyle>
+      </div>
+    </header>
   );
 }
 
@@ -58,38 +44,53 @@ function Search({ open }: { open: boolean }) {
   };
 
   return (
-    <SearchForm className={open ? "open" : ""} onSubmit={onSummit} id="search">
-      <HideLabelStyle htmlFor="search-input">Search term</HideLabelStyle>
-      <InputGroupStyle>
+    <form
+      className={`search-form ${open ? "search-open" : ""}`}
+      onSubmit={onSummit}
+      id="search"
+    >
+      <label className="hide" htmlFor="search-input">
+        Search term
+      </label>
+      <div className="inputGroup">
         <SearchIcon />
-        <InputGroupControlStyle
+        <input
+          className="bg-transparent flex-grow outline-none border-none"
           name="search"
           type="search"
           placeholder="Search"
           id="search-input"
         />
-      </InputGroupStyle>
-    </SearchForm>
+      </div>
+    </form>
   );
 }
 
 function LeftBlock(props: { toggleNav: () => void; open: boolean }) {
   return (
-    <LeftBlockStyle>
-      <NavOpenBtn aria-label="toggle navigation menu" onClick={props.toggleNav}>
+    <div className="flex items-center gap-2 sm:gap-6">
+      <button
+        className="icon-btn w-8"
+        aria-label="toggle navigation menu"
+        onClick={props.toggleNav}
+      >
         {props.open ? <Close /> : <ThreeBars />}
-      </NavOpenBtn>
-      <h1>Mosaic</h1>
-    </LeftBlockStyle>
+      </button>
+      <h1 className="font-bold text-3xl m-0 title-hidden ">Mosaic</h1>
+    </div>
   );
 }
 
 function HeadButtons({ toggleSearch }: { toggleSearch: () => void }) {
   return (
-    <AuthButtonsStyle>
-      <SearchBtnStyle aria-label="open search" onClick={toggleSearch}>
+    <div className="items-center flex gap-1">
+      <button
+        className="icon-btn md:hidden"
+        aria-label="open search"
+        onClick={toggleSearch}
+      >
         <MagnifyingGlass />
-      </SearchBtnStyle>
+      </button>
       {isLoggedIn() ? (
         <LogOut />
       ) : (
@@ -98,7 +99,7 @@ function HeadButtons({ toggleSearch }: { toggleSearch: () => void }) {
           <SignUpBtn />
         </>
       )}
-    </AuthButtonsStyle>
+    </div>
   );
 }
 

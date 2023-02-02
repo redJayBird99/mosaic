@@ -1,29 +1,5 @@
 import styled from "styled-components";
 
-export const InputGroupStyle = styled.div`
-  align-items: stretch;
-  background-color: transparent;
-  border-radius: 12px;
-  border: 1px solid var(--bg-color-200);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.1);
-  display: flex;
-  padding: 6px 12px;
-  transition: all linear 0.2s;
-
-  &:focus-within {
-    border-color: var(--primary-color-400);
-    color: #212529;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-  }
-`;
-
-export const InputGroupControlStyle = styled.input`
-  background-color: transparent;
-  border: none;
-  flex-grow: 1;
-  outline: none;
-`;
-
 export const SelectStyle = styled.select`
   appearance: none;
   -moz-padding-start: calc(0.75rem - 3px);
@@ -85,9 +61,4 @@ export const InputStyle = styled.input`
     border-color: var(--error-color);
     box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
   }
-`;
-
-export const HideLabelStyle = styled.label`
-  position: absolute;
-  left: -999rem;
 `;
