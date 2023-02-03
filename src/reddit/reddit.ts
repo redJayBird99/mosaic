@@ -6,17 +6,20 @@ type RedditPosition = {
   after?: string;
   count?: number;
 };
+
 export type Media = {
   url: string;
   width: number;
   height: number;
 };
+
 /** the url is a MPEG-DASH url */
 export type MediaVideo = {
   hls_url: string;
   fallback_url: string;
   poster: string;
 } & Media;
+
 export type Content = {
   id: string;
   title: string;
@@ -28,6 +31,13 @@ export type Content = {
   link: string;
   video?: MediaVideo;
   images?: Media[];
+};
+
+export type User = {
+  iconUrl: string;
+  name: string;
+  created: number;
+  karma: number;
 };
 
 async function redditFetch(url: string) {
@@ -67,6 +77,12 @@ async function search(q: Query, p: RedditPosition) {
     }${p.count ? `&count=${p.count}` : ""}${q.sort ? `&sort=${q.sort}` : ""}${
       q.t ? `&t=${q.t}` : ""
     }`
+  );
+}
+
+async function searchUser(q: string, p: RedditPosition) {
+  return await redditFetch(
+    `https://www.reddit.com/search.json?raw_json=1&type=user&&q=${q}`
   );
 }
 
@@ -176,6 +192,15 @@ export class SavedBatch implements ContentBatch {
   }
 }
 
+export async function remoteUser(q: string) {
+  const json = await searchUser(q, { limit: 30, count: 0 });
+  return (
+    json?.data?.children
+      .map((v: any) => toUser(v.data))
+      .filter((u: User | undefined) => u) ?? []
+  );
+}
+
 /** get and store content from the given reddit listing */
 export function listingContent(listing: string): ContentBatch {
   return new RemoteBatch(
@@ -225,4 +250,15 @@ function toMediaContent(data: JsonRes): Content | undefined {
   }
 
   return;
+}
+
+function toUser(data: JsonRes): User | undefined {
+  if (data.name) {
+    return {
+      name: data.name,
+      iconUrl: data.icon_img,
+      created: data.created_utc * 1000,
+      karma: data.comment_karma,
+    };
+  }
 }

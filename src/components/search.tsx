@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   Query,
@@ -10,6 +10,7 @@ import {
 import { Posts } from "./posts";
 import { QueryCtnrStyle } from "./styles/App.style";
 import { SelectStyle } from "./styles/form.style";
+import { Users } from "./users";
 
 type HandleChange = (e: ChangeEvent<HTMLSelectElement>) => void;
 type OnQueryChange = (key: keyof Query) => HandleChange;
@@ -33,6 +34,20 @@ function useQuerySearch(): [Query, OnQueryChange] {
 }
 
 export function Search() {
+  const [type, setType] = useState("");
+
+  return (
+    <>
+      <div>
+        <button onClick={() => setType("")}>Posts</button>
+        <button onClick={() => setType("user")}>People</button>
+      </div>
+      {type === "" ? <SearchPosts /> : <SearchUser />}
+    </>
+  );
+}
+
+function SearchPosts() {
   const [q, onChange] = useQuerySearch();
 
   const controls = (
@@ -64,4 +79,11 @@ export function Search() {
   return (
     <Posts key={Math.random()} reddit={searchContent(q)} Controls={controls} />
   );
+}
+
+function SearchUser() {
+  let [searchPms] = useSearchParams();
+  const q = searchPms.get("q");
+
+  return q ? <Users q={q} key={Math.random()} /> : null;
 }
