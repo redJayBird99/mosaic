@@ -23,6 +23,10 @@ export const SelectStyle = styled.select`
   }
 `;
 
+export const SelectQueryStyle = styled(SelectStyle)`
+  width: 8rem;
+`;
+
 export const InputStyle = styled.input`
   appearance: none;
   background-color: var(--bg-color);

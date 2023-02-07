@@ -8,10 +8,10 @@ import {
   timeOptions,
 } from "../reddit/reddit";
 import { Posts } from "./posts";
-import { QueryCtnrStyle } from "./styles/App.style";
-import { SelectStyle } from "./styles/form.style";
+import { SelectQueryStyle } from "./styles/form.style";
 import { Users } from "./users";
 
+type SearchType = "post" | "user";
 type HandleChange = (e: ChangeEvent<HTMLSelectElement>) => void;
 type OnQueryChange = (key: keyof Query) => HandleChange;
 
@@ -34,45 +34,66 @@ function useQuerySearch(): [Query, OnQueryChange] {
 }
 
 export function Search() {
-  const [type, setType] = useState("");
+  const [type, setType] = useState<SearchType>("post");
 
-  return (
-    <>
-      <div>
-        <button onClick={() => setType("")}>Posts</button>
-        <button onClick={() => setType("user")}>People</button>
-      </div>
-      {type === "" ? <SearchPosts /> : <SearchUser />}
-    </>
+  const TypeControls = (
+    <div className="mb-2 flex gap-1">
+      <button
+        className={`btn-sub-search ${type === "post" ? "bg-white shadow" : ""}`}
+        onClick={() => setType("post")}
+      >
+        Posts
+      </button>
+      <button
+        className={`btn-sub-search ${type === "user" ? "bg-white shadow" : ""}`}
+        onClick={() => setType("user")}
+      >
+        People
+      </button>
+    </div>
+  );
+
+  return type === "post" ? (
+    <SearchPosts ctrl={TypeControls} />
+  ) : (
+    <SearchUser ctrl={TypeControls} />
   );
 }
 
-function SearchPosts() {
+function SearchPosts(props: { ctrl: JSX.Element }) {
   const [q, onChange] = useQuerySearch();
 
   const controls = (
-    <QueryCtnrStyle>
-      <SelectStyle
-        onChange={onChange("sort")}
-        value={q.sort ?? ""}
-        form="search"
-      >
-        <option value="">Sort</option>
-        {sortOptions.map((e) => (
-          <option value={e} key={e}>
-            {e}
-          </option>
-        ))}
-      </SelectStyle>
-      <SelectStyle onChange={onChange("t")} value={q.t ?? ""} form="search">
-        <option value="">Time</option>
-        {timeOptions.map((e) => (
-          <option value={e} key={e}>
-            {e}
-          </option>
-        ))}
-      </SelectStyle>
-    </QueryCtnrStyle>
+    <section className="col-span-full">
+      {props.ctrl}
+      <div className="flex gap-1">
+        <SelectQueryStyle
+          className="w-32"
+          onChange={onChange("sort")}
+          value={q.sort ?? ""}
+          form="search"
+        >
+          <option value="">Sort</option>
+          {sortOptions.map((e) => (
+            <option value={e} key={e}>
+              {e}
+            </option>
+          ))}
+        </SelectQueryStyle>
+        <SelectQueryStyle
+          onChange={onChange("t")}
+          value={q.t ?? ""}
+          form="search"
+        >
+          <option value="">Time</option>
+          {timeOptions.map((e) => (
+            <option value={e} key={e}>
+              {e}
+            </option>
+          ))}
+        </SelectQueryStyle>
+      </div>
+    </section>
   );
 
   // random because we want a full refresh when already on current url (the state of the posts change with time)
@@ -81,9 +102,14 @@ function SearchPosts() {
   );
 }
 
-function SearchUser() {
+function SearchUser(props: { ctrl: JSX.Element }) {
   let [searchPms] = useSearchParams();
   const q = searchPms.get("q");
 
-  return q ? <Users q={q} key={Math.random()} /> : null;
+  return q ? (
+    <div>
+      {props.ctrl}
+      <Users q={q} key={Math.random()} />
+    </div>
+  ) : null;
 }

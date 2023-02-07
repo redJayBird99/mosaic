@@ -57,13 +57,3 @@ export const LoadingRingStyle = styled.div`
     animation-delay: -0.15s;
   }
 `;
-
-export const QueryCtnrStyle = styled.div`
-  display: flex;
-  gap: 0.25rem;
-  grid-column: 1 / -1;
-
-  & > * {
-    width: 8rem;
-  }
-`;
