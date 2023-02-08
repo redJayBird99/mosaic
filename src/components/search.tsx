@@ -107,7 +107,7 @@ function SearchUser(props: { ctrl: JSX.Element }) {
   const q = searchPms.get("q");
 
   return q ? (
-    <div>
+    <div className="max-w-7xl mx-auto my-4 px-clamp-1">
       {props.ctrl}
       <Users q={q} key={Math.random()} />
     </div>

@@ -5,7 +5,7 @@ module.exports = {
     extend: {
       colors: {
         onBg: {
-          600: "#262626",
+          600: "#4d4d4d",
           800: "#0d0d0d",
         },
       },
