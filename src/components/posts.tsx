@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef } from "react";
-import { Content, ContentBatch } from "../reddit/reddit";
+import { Content, Batcher } from "../reddit/reddit";
 import { NotFound, Post } from "./post";
 import { SkeletonPost } from "./skeleton-post";
 import {
@@ -10,7 +10,10 @@ import {
 import { useRedditApi } from "./use-reddit";
 
 /** render the posts from the given content fetcher, or fallback component (error or not found) */
-export function Posts(props: { reddit: ContentBatch; Controls?: JSX.Element }) {
+export function Posts(props: {
+  reddit: Batcher<Content>;
+  Controls?: JSX.Element;
+}) {
   const [state, fetchContent] = useRedditApi(props.reddit);
   // we don't need to update it, because when ContentBatch change the entire
   // component is rebuild from scratch on every navigation, although it still initial and ignored currently
@@ -150,7 +153,7 @@ function PostsTail({ obs }: { obs: IntersectionObserver }) {
   return <div ref={divRef}></div>;
 }
 
-function LoadingWindow() {
+export function LoadingWindow() {
   return (
     <LoadingWindowStyle>
       <LoadingRingStyle>

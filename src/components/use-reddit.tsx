@@ -1,19 +1,22 @@
 import { useReducer } from "react";
-import { Batch, Content, ContentBatch } from "../reddit/reddit";
+import { Batch, Batcher } from "../reddit/reddit";
 
-type FetcherState = {
-  c: Content[];
+type FetcherState<T> = {
+  c: T[];
   error: boolean;
   loading: boolean;
   end: boolean;
 };
 
-type FetcherAction = {
+type FetcherAction<T> = {
   type: "FETCH_SUCCESS" | "FETCH_ERROR" | "FETCH_END" | "STOP_LOADING";
-  c?: Content[];
+  c?: T[];
 };
 
-function contentFetchReducer(state: FetcherState, action: FetcherAction) {
+function contentFetchReducer<T>(
+  state: FetcherState<T>,
+  action: FetcherAction<T>
+) {
   switch (action.type) {
     case "FETCH_SUCCESS":
       return {
@@ -40,7 +43,9 @@ function contentFetchReducer(state: FetcherState, action: FetcherAction) {
   }
 }
 
-export function useRedditApi(reddit: ContentBatch): [FetcherState, () => void] {
+export function useRedditApi<T>(
+  reddit: Batcher<T>
+): [FetcherState<T>, () => void] {
   const [state, dispatch] = useReducer(contentFetchReducer, {
     c: [],
     loading: true,
@@ -56,7 +61,7 @@ export function useRedditApi(reddit: ContentBatch): [FetcherState, () => void] {
   };
 
   async function fetchContent() {
-    let batch: Batch = { data: [], done: false };
+    let batch: Batch<T> = { data: [], done: false };
 
     try {
       batch = await reddit.getBatch();
@@ -75,5 +80,5 @@ export function useRedditApi(reddit: ContentBatch): [FetcherState, () => void] {
     }
   }
 
-  return [state, fetchContent];
+  return [state as FetcherState<T>, fetchContent];
 }

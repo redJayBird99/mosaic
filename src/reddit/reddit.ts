@@ -1,5 +1,7 @@
 import { getSavedContent } from "../util/history";
 
+const MAX_COUNT = 100;
+
 type JsonRes = any;
 type RedditPosition = {
   limit: number;
@@ -38,6 +40,7 @@ export type User = {
   name: string;
   created: number;
   karma: number;
+  id: string;
 };
 
 async function redditFetch(url: string) {
@@ -82,7 +85,9 @@ async function search(q: Query, p: RedditPosition) {
 
 async function searchUser(q: string, p: RedditPosition) {
   return await redditFetch(
-    `https://www.reddit.com/search.json?raw_json=1&type=user&&q=${q}`
+    `https://www.reddit.com/search.json?raw_json=1&type=user&&q=${q}&limit=${
+      p.limit
+    }${p.after ? `&after=${p.after}` : ""}${p.count ? `&count=${p.count}` : ""}`
   );
 }
 
@@ -97,17 +102,17 @@ export function serializeQuery(q: Query): { [key: string]: string } {
   return rst;
 }
 
-export type Batch = { data: Content[]; done: boolean };
-export interface ContentBatch {
+export type Batch<T> = { data: T[]; done: boolean };
+export interface Batcher<T> {
   /** get a batch of Content */
-  getBatch(): Promise<Batch>;
+  getBatch(): Promise<Batch<T>>;
   /** what was searching or listing */
   q?: string;
 }
 
 /** an interface to fetch and consume content from the reddit api */
-class RemoteBatch implements ContentBatch {
-  private buff: Content[] = [];
+class RemoteBatch<T extends { id: string }> implements Batcher<T> {
+  private buff: T[] = [];
   private fetched = new Set<string>();
   private count = 0;
   private after: undefined | string;
@@ -120,6 +125,8 @@ class RemoteBatch implements ContentBatch {
   /** the fetcher is responsible for the specific reddit api request, while this class keep track of position */
   constructor(
     private fetcher: (p: RedditPosition) => Promise<JsonRes>,
+    private transformer: (r: JsonRes) => T | undefined,
+    private batchSize: number,
     public q: string
   ) {}
 
@@ -127,9 +134,13 @@ class RemoteBatch implements ContentBatch {
    * it keep making request until a threshold buffer is reached (so we can amortize the fetching delay cost)
    */
   async fetch() {
-    const fetchSize = 30;
+    const fetchSize = Math.min(this.batchSize * 3, MAX_COUNT);
 
-    if (!this.remoteEnd && !this.fetching && this.buff.length <= 25) {
+    if (
+      !this.remoteEnd &&
+      !this.fetching &&
+      this.buff.length <= Math.min(this.batchSize * 1.5, MAX_COUNT)
+    ) {
       this.fetching = true;
       const json = await this.fetcher({
         limit: fetchSize,
@@ -144,8 +155,8 @@ class RemoteBatch implements ContentBatch {
 
       this.buff.push(
         ...json.data.children
-          .map((r: JsonRes) => toMediaContent(r.data))
-          .filter((r: Content | undefined) => {
+          .map((r: JsonRes) => this.transformer(r.data))
+          .filter((r: T | undefined) => {
             if (r && !this.fetched.has(r.id)) {
               this.fetched.add(r.id);
               return true;
@@ -162,7 +173,7 @@ class RemoteBatch implements ContentBatch {
    * multiple called while it is already fetching are ignore,
    * @Returns an array of content and a flag indicating if there is more content available
    */
-  async getBatch(): Promise<Batch> {
+  async getBatch(): Promise<Batch<T>> {
     // there is no need to resolve multiple request if the fetching is pending
     if (!this.clientWaiting && this.buff.length === 0) {
       this.clientWaiting = true;
@@ -172,46 +183,59 @@ class RemoteBatch implements ContentBatch {
       this.fetch();
     }
 
-    const batch = this.buff.splice(
-      0,
-      this.buff.length <= 14 ? this.buff.length : 10
-    );
+    const batch = this.buff.splice(0, this.batchSize);
     return { data: batch, done: this.remoteEnd && this.buff.length === 0 };
   }
 }
 
-export class SavedBatch implements ContentBatch {
+export class SavedBatch implements Batcher<Content> {
   private buff = getSavedContent();
 
   /** get a batch of the content saved by the user, from the reddit api (some duplicate is possible),
    * @Returns an array of content and a flag indicating if there is more content available
    */
-  async getBatch(): Promise<Batch> {
+  async getBatch(): Promise<Batch<Content>> {
     const batch = this.buff.splice(0, 10);
     return { data: batch, done: this.buff.length === 0 };
   }
 }
 
-export async function remoteUser(q: string) {
-  const json = await searchUser(q, { limit: 30, count: 0 });
-  return (
-    json?.data?.children
-      .map((v: any) => toUser(v.data))
-      .filter((u: User | undefined) => u) ?? []
+// export async function searchRemoteUser(q: string) {
+//   const json = await searchUser(q, { limit: 30, count: 0 });
+//   return (
+//     json?.data?.children
+//       .map((v: any) => toUser(v.data))
+//       .filter((u: User | undefined) => u) ?? []
+//   );
+// }
+
+export function searchRemoteUser(q: string): Batcher<User> {
+  return new RemoteBatch<User>(
+    (p: RedditPosition) => searchUser(q, p),
+    toUser,
+    30,
+    q
   );
 }
 
 /** get and store content from the given reddit listing */
-export function listingContent(listing: string): ContentBatch {
-  return new RemoteBatch(
+export function listingContent(listing: string): Batcher<Content> {
+  return new RemoteBatch<Content>(
     (p: RedditPosition) => getListing(listing, p),
+    toMediaContent,
+    10,
     listing
   );
 }
 
 /** get and store content from the given reddit listing */
-export function searchContent(q: Query): ContentBatch {
-  return new RemoteBatch((p: RedditPosition) => search(q, p), q.q ?? "");
+export function searchContent(q: Query): Batcher<Content> {
+  return new RemoteBatch<Content>(
+    (p: RedditPosition) => search(q, p),
+    toMediaContent,
+    10,
+    q.q ?? ""
+  );
 }
 
 /** if the give data is an video or a image response converts it to Content */
@@ -259,6 +283,7 @@ function toUser(data: JsonRes): User | undefined {
       iconUrl: data.icon_img,
       created: data.created_utc * 1000,
       karma: data.comment_karma,
+      id: data.id ?? data.name,
     };
   }
 }

@@ -1,34 +1,49 @@
-import { useEffect, useState } from "react";
-import { remoteUser, User } from "../reddit/reddit";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { searchRemoteUser, User } from "../reddit/reddit";
+import { LoadingWindow } from "./posts";
+import { useRedditApi } from "./use-reddit";
 
 export function Users({ q }: { q: string }) {
-  const [users, setUsers] = useState([]);
+  // every time the query change this component rebuilds from scratch
+  const [uBatcher] = useState(() => searchRemoteUser(q));
+  const [state, fetchUsers] = useRedditApi(uBatcher);
+  const obsRef = useRef(
+    new IntersectionObserver((es) => {
+      console.log(es);
+      es.forEach((e) => e.isIntersecting && fetchUsers());
+    })
+  );
 
   useEffect(() => {
-    const getUsers = async () => {
-      const res = await remoteUser(q);
-      setUsers(res);
-    };
-    getUsers();
+    fetchUsers();
   }, []);
 
   return (
     <div className="grid auto-fit-20rem gap-1">
-      {users.map((u: User) => (
+      {state.c.map((u: User) => (
         <UserCard u={u} key={u.name} />
       ))}
+      {state.end ? null : <UserTail key={Math.random()} obs={obsRef.current} />}
+      {state.loading && <LoadingWindow />}
     </div>
   );
 }
 
 export function UserCard({ u }: { u: User }) {
+  const removeAnimation = (e: HTMLImageElement) =>
+    e?.classList.remove("skeleton-animate");
+
   return (
     <div className="flex bg-white shadow items-center p-4 gap-2 rounded">
       <div>
         <img
-          className="w-12 h-12 rounded-full"
+          className="skeleton-animate w-12 h-12 rounded-full"
           src={u.iconUrl}
-          alt="profile image"
+          alt="avatar"
+          height="48"
+          width="48"
+          onLoad={(e) => removeAnimation(e.target as HTMLImageElement)}
+          onError={(e) => removeAnimation(e.target as HTMLImageElement)}
         />
       </div>
       <div>
@@ -44,11 +59,46 @@ export function UserCard({ u }: { u: User }) {
 }
 
 function formatKarma(karma: number): string {
-  if (karma < 1000) {
+  if (Math.abs(karma) < 1000) {
     return String(karma);
-  } else if (karma < 1_000_000) {
+  } else if (Math.abs(karma) < 1_000_000) {
     return (karma / 1000).toFixed(2) + "k";
   } else {
     return (karma / 1_000_000).toFixed(2) + "m";
   }
+}
+
+export function SkeletonCard() {
+  return (
+    <div className="flex bg-white shadow items-center p-4 gap-2 rounded max-w-md">
+      <div>
+        <div className="skeleton-animate w-12 h-12 rounded-full" />
+      </div>
+      <div className="flex-grow">
+        <div className="truncate">
+          <div className="h-3 leading-4 skeleton-animate rounded-md w-1/2 mb-3" />
+          <div className="h-2 skeleton-animate w-1/4 rounded-md" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** every time this element connects add itself to the observer,
+ * tail of all users so when the bottom is reached fetch new ones*/
+function UserTail({ obs }: { obs: IntersectionObserver }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  // useEffect runs asynchronously so when cleaning up the reference to divRef.current
+  // won't exist, so we need to go synchronously using useLayoutEffect
+  useLayoutEffect(() => {
+    obs.observe(ref.current!);
+    return () => obs.unobserve(ref.current!);
+  }, [obs]);
+
+  return (
+    <div ref={ref}>
+      <SkeletonCard />
+    </div>
+  );
 }

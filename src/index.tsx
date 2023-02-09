@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { App, mainRoutes, Page404 } from "./components/App";
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { remoteUser } from "./reddit/reddit";
+import { searchRemoteUser } from "./reddit/reddit";
 
 /** this function is specifically to handle a customized redirection from the 404 github pages,
  * because gitHub pages doesn't support Single Page Apps we need some hacks
