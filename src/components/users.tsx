@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { searchRemoteUser, User } from "../reddit/reddit";
-import { LoadingWindow } from "./posts";
+import { ErrorWarning, LoadingWindow, UnsuccessfulSearch } from "./posts";
 import { useRedditApi } from "./use-reddit";
 
 export function Users({ q }: { q: string }) {
@@ -17,15 +17,23 @@ export function Users({ q }: { q: string }) {
     fetchUsers();
   }, []);
 
-  return (
-    <div className="grid auto-fit-20rem gap-1">
-      {state.c.map((u: User) => (
-        <UserCard u={u} key={u.name} />
-      ))}
-      {state.end ? null : <UserTail key={Math.random()} obs={obsRef.current} />}
-      {state.loading && <LoadingWindow />}
-    </div>
-  );
+  if (state.error) {
+    return <ErrorWarning />;
+  } else if (state.end && state.c.length === 0) {
+    return <UnsuccessfulSearch q={q} />;
+  } else {
+    return (
+      <div className="grid auto-fit-20rem gap-1">
+        {state.c.map((u: User) => (
+          <UserCard u={u} key={u.name} />
+        ))}
+        {state.end ? null : (
+          <UserTail key={Math.random()} obs={obsRef.current} />
+        )}
+        {state.loading && <LoadingWindow />}
+      </div>
+    );
+  }
 }
 
 export function UserCard({ u }: { u: User }) {

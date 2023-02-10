@@ -50,7 +50,7 @@ async function redditFetch(url: string) {
     return await res.json();
   } else {
     // TODO
-    console.error(res.status);
+    console.error("WHAT", res.status);
     throw new Error(`the request resolved with ${res.status} status`);
   }
 }
@@ -147,23 +147,27 @@ class RemoteBatch<T extends { id: string }> implements Batcher<T> {
         count: this.count,
         after: this.after,
       });
+      const data = json?.data ?? {};
       this.fetching = false;
 
-      if (!json.data.after) {
+      if (!data.after) {
         this.remoteEnd = true;
       }
 
-      this.buff.push(
-        ...json.data.children
-          .map((r: JsonRes) => this.transformer(r.data))
-          .filter((r: T | undefined) => {
-            if (r && !this.fetched.has(r.id)) {
-              this.fetched.add(r.id);
-              return true;
-            }
-          })
-      );
-      this.after = json.data.after;
+      if (data.children) {
+        this.buff.push(
+          ...data.children
+            .map((r: JsonRes) => this.transformer(r.data))
+            .filter((r: T | undefined) => {
+              if (r && !this.fetched.has(r.id)) {
+                this.fetched.add(r.id);
+                return true;
+              }
+            })
+        );
+      }
+
+      this.after = data.after;
       this.count += fetchSize;
       this.fetch();
     }
@@ -199,15 +203,6 @@ export class SavedBatch implements Batcher<Content> {
     return { data: batch, done: this.buff.length === 0 };
   }
 }
-
-// export async function searchRemoteUser(q: string) {
-//   const json = await searchUser(q, { limit: 30, count: 0 });
-//   return (
-//     json?.data?.children
-//       .map((v: any) => toUser(v.data))
-//       .filter((u: User | undefined) => u) ?? []
-//   );
-// }
 
 export function searchRemoteUser(q: string): Batcher<User> {
   return new RemoteBatch<User>(

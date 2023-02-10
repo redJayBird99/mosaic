@@ -66,6 +66,7 @@ export function useRedditApi<T>(
     try {
       batch = await reddit.getBatch();
     } catch (e: any) {
+      console.log(e, "WHAT");
       // TODO: add some info
       dispatch({ type: "FETCH_ERROR" });
       stopLoading();

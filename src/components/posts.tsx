@@ -32,23 +32,9 @@ export function Posts(props: {
   }, [props.reddit]);
 
   if (state.error) {
-    return (
-      <NotFound
-        text={
-          "Sorry, unfortunately something went wrong. usually the problem could be that external requests to the Reddit api were blocked by some extension (like DuckDuckGo privacy, abs Block and etc) or some stricter browser privacy setting."
-        }
-      />
-    );
+    return <ErrorWarning />;
   } else if (state.end && state.c.length === 0) {
-    return (
-      <NotFound
-        text={
-          props.reddit.q
-            ? `Sorry, we couldn't find any results for "${props.reddit.q}"`
-            : ""
-        }
-      />
-    );
+    return <UnsuccessfulSearch />;
   } else {
     return (
       <PostsContainer
@@ -163,5 +149,23 @@ export function LoadingWindow() {
         <div></div>
       </LoadingRingStyle>
     </LoadingWindowStyle>
+  );
+}
+
+export function ErrorWarning() {
+  return (
+    <NotFound
+      text={
+        "Sorry, unfortunately something went wrong. usually the problem could be that external requests to the Reddit api were blocked by some extension (like DuckDuckGo privacy, abs Block and etc) or some stricter browser privacy setting."
+      }
+    />
+  );
+}
+
+export function UnsuccessfulSearch({ q }: { q?: string }) {
+  return (
+    <NotFound
+      text={q ? `Sorry, we couldn't find any results for the term "${q}"` : ""}
+    />
   );
 }
