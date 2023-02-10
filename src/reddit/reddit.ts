@@ -277,7 +277,8 @@ function toMediaContent(data: JsonRes): Content | undefined {
 }
 
 function toUser(data: JsonRes): User | undefined {
-  if (data.name) {
+  // for now we don't touch suspended accounts
+  if (data.name && !data.is_suspended && !data.is_blocked) {
     return {
       name: data.name,
       iconUrl: data.icon_img,

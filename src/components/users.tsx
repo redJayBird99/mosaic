@@ -9,7 +9,6 @@ export function Users({ q }: { q: string }) {
   const [state, fetchUsers] = useRedditApi(uBatcher);
   const obsRef = useRef(
     new IntersectionObserver((es) => {
-      console.log(es);
       es.forEach((e) => e.isIntersecting && fetchUsers());
     })
   );
