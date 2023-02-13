@@ -43,6 +43,14 @@ export type User = {
   id: string;
 };
 
+export type Community = {
+  iconUrl?: string;
+  name: string;
+  subscribers: number;
+  description: string;
+  id: string;
+};
+
 async function redditFetch(url: string) {
   const res = await fetch(url);
 
@@ -85,7 +93,15 @@ async function search(q: Query, p: RedditPosition) {
 
 async function searchUser(q: string, p: RedditPosition) {
   return await redditFetch(
-    `https://www.reddit.com/search.json?raw_json=1&type=user&&q=${q}&limit=${
+    `https://www.reddit.com/search.json?raw_json=1&type=user&q=${q}&limit=${
+      p.limit
+    }${p.after ? `&after=${p.after}` : ""}${p.count ? `&count=${p.count}` : ""}`
+  );
+}
+
+async function searchSub(q: string, p: RedditPosition) {
+  return await redditFetch(
+    `https://www.reddit.com/search.json?raw_json=1&type=sr&q=${q}&limit=${
       p.limit
     }${p.after ? `&after=${p.after}` : ""}${p.count ? `&count=${p.count}` : ""}`
   );
@@ -213,6 +229,15 @@ export function searchRemoteUser(q: string): Batcher<User> {
   );
 }
 
+export function searchRemoteCommunity(q: string): Batcher<Community> {
+  return new RemoteBatch<Community>(
+    (p: RedditPosition) => searchSub(q, p),
+    toCommunity,
+    15,
+    q
+  );
+}
+
 /** get and store content from the given reddit listing */
 export function listingContent(listing: string): Batcher<Content> {
   return new RemoteBatch<Content>(
@@ -280,6 +305,18 @@ function toUser(data: JsonRes): User | undefined {
       created: data.created_utc * 1000,
       karma: data.comment_karma,
       id: data.id ?? data.name,
+    };
+  }
+}
+
+function toCommunity(data: JsonRes): Community | undefined {
+  if (data.id) {
+    return {
+      description: data.public_description,
+      name: data.display_name,
+      iconUrl: data.community_icon,
+      id: data.id,
+      subscribers: data.subscribers,
     };
   }
 }

@@ -7,11 +7,12 @@ import {
   sortOptions,
   timeOptions,
 } from "../reddit/reddit";
+import { Communities } from "./community";
 import { Posts } from "./posts";
 import { SelectQueryStyle } from "./styles/form.style";
 import { Users } from "./users";
 
-type SearchType = "post" | "user";
+type SearchType = "post" | "user" | "community";
 type HandleChange = (e: ChangeEvent<HTMLSelectElement>) => void;
 type OnQueryChange = (key: keyof Query) => HandleChange;
 
@@ -50,14 +51,24 @@ export function Search() {
       >
         People
       </button>
+      <button
+        className={`btn-sub-search ${
+          type === "community" ? "bg-white shadow" : ""
+        }`}
+        onClick={() => setType("community")}
+      >
+        Communities
+      </button>
     </div>
   );
 
-  return type === "post" ? (
-    <SearchPosts ctrl={TypeControls} />
-  ) : (
-    <SearchUser ctrl={TypeControls} />
-  );
+  if (type === "post") {
+    return <SearchPosts ctrl={TypeControls} />;
+  } else if (type === "user") {
+    return <SearchUser ctrl={TypeControls} />;
+  } else {
+    return <SearchCommunity ctrl={TypeControls} />;
+  }
 }
 
 function SearchPosts(props: { ctrl: JSX.Element }) {
@@ -110,6 +121,18 @@ function SearchUser(props: { ctrl: JSX.Element }) {
     <div className="max-w-7xl mx-auto my-4 px-clamp-1">
       {props.ctrl}
       <Users q={q} key={Math.random()} />
+    </div>
+  ) : null;
+}
+
+function SearchCommunity(props: { ctrl: JSX.Element }) {
+  let [params] = useSearchParams();
+  const q = params.get("q");
+
+  return q ? (
+    <div className="max-w-7xl mx-auto my-4 px-clamp-1">
+      {props.ctrl}
+      <Communities q={q} />
     </div>
   ) : null;
 }

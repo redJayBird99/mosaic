@@ -37,27 +37,16 @@ export function Users({ q }: { q: string }) {
 }
 
 export function UserCard({ u }: { u: User }) {
-  const removeAnimation = (e: HTMLImageElement) =>
-    e?.classList.remove("skeleton-animate");
-
   return (
     <div className="flex bg-white shadow items-center p-4 gap-2 rounded">
       <div>
-        <img
-          className="skeleton-animate w-12 h-12 rounded-full"
-          src={u.iconUrl}
-          alt="avatar"
-          height="48"
-          width="48"
-          onLoad={(e) => removeAnimation(e.target as HTMLImageElement)}
-          onError={(e) => removeAnimation(e.target as HTMLImageElement)}
-        />
+        <CardAvatar url={u.iconUrl} />
       </div>
       <div>
         <div className="truncate">
           <h3 className="font-bold leading-4">{u.name}</h3>
           <span className="text-xs text-onBg-600">
-            {formatKarma(u.karma)} karma
+            {formatAmount(u.karma)} karma
           </span>
         </div>
       </div>
@@ -65,7 +54,7 @@ export function UserCard({ u }: { u: User }) {
   );
 }
 
-function formatKarma(karma: number): string {
+export function formatAmount(karma: number): string {
   if (Math.abs(karma) < 1000) {
     return String(karma);
   } else if (Math.abs(karma) < 1_000_000) {
@@ -107,5 +96,22 @@ function UserTail({ obs }: { obs: IntersectionObserver }) {
     <div ref={ref}>
       <SkeletonCard />
     </div>
+  );
+}
+
+export function CardAvatar(props: { url: string }) {
+  const removeAnimation = (e: HTMLImageElement) =>
+    e?.classList.remove("skeleton-animate");
+
+  return (
+    <img
+      className="skeleton-animate w-12 h-12 rounded-full"
+      src={props.url}
+      alt="avatar"
+      height="48"
+      width="48"
+      onLoad={(e) => removeAnimation(e.target as HTMLImageElement)}
+      onError={(e) => removeAnimation(e.target as HTMLImageElement)}
+    />
   );
 }
