@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { searchRemoteUser, User } from "../reddit/reddit";
 import { ErrorWarning, LoadingWindow, UnsuccessfulSearch } from "./posts";
 import { useRedditApi } from "./use-reddit";
+import imgPh from "../asset/reddit-place-holder.png";
 
 export function Users({ q }: { q: string }) {
   // every time the query change this component rebuilds from scratch
@@ -116,7 +117,7 @@ export function CardAvatar(props: { url: string }) {
   return (
     <img
       className="skeleton-animate w-12 h-12 rounded-full"
-      src={props.url}
+      src={props.url || imgPh}
       alt="avatar"
       height="48"
       width="48"
