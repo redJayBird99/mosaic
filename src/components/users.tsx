@@ -28,7 +28,7 @@ export function Users({ q }: { q: string }) {
           <UserCard u={u} key={u.name} />
         ))}
         {state.end ? null : (
-          <UserTail key={Math.random()} obs={obsRef.current} />
+          <TailCard key={Math.random()} obs={obsRef.current} type="user" />
         )}
         {state.loading && <LoadingWindow />}
       </div>
@@ -64,9 +64,13 @@ export function formatAmount(karma: number): string {
   }
 }
 
-export function SkeletonCard() {
+export function SkeletonCard({ type }: { type: "user" | "community" }) {
   return (
-    <div className="flex bg-white shadow items-center p-4 gap-2 rounded max-w-md">
+    <div
+      className={`flex bg-white shadow items-center p-4 gap-2 rounded ${
+        type === "user" ? "max-w-md" : ""
+      }`}
+    >
       <div>
         <div className="skeleton-animate w-12 h-12 rounded-full" />
       </div>
@@ -82,7 +86,13 @@ export function SkeletonCard() {
 
 /** every time this element connects add itself to the observer,
  * tail of all users so when the bottom is reached fetch new ones*/
-function UserTail({ obs }: { obs: IntersectionObserver }) {
+export function TailCard({
+  obs,
+  type,
+}: {
+  obs: IntersectionObserver;
+  type: "user" | "community";
+}) {
   const ref = useRef<HTMLDivElement>(null);
 
   // useEffect runs asynchronously so when cleaning up the reference to divRef.current
@@ -94,7 +104,7 @@ function UserTail({ obs }: { obs: IntersectionObserver }) {
 
   return (
     <div ref={ref}>
-      <SkeletonCard />
+      <SkeletonCard type={type} />
     </div>
   );
 }
