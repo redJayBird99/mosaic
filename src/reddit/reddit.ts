@@ -22,7 +22,7 @@ export type MediaVideo = {
   poster: string;
 } & Media;
 
-export type Content = {
+export type Post = {
   id: string;
   title: string;
   author: string;
@@ -31,6 +31,8 @@ export type Content = {
   subreddit: string;
   voteRatio: number;
   link: string;
+  isSelf: boolean;
+  selfText?: string;
   video?: MediaVideo;
   images?: Media[];
 };
@@ -208,13 +210,13 @@ class RemoteBatch<T extends { id: string }> implements Batcher<T> {
   }
 }
 
-export class SavedBatch implements Batcher<Content> {
+export class SavedBatch implements Batcher<Post> {
   private buff = getSavedContent();
 
   /** get a batch of the content saved by the user, from the reddit api (some duplicate is possible),
    * @Returns an array of content and a flag indicating if there is more content available
    */
-  async getBatch(): Promise<Batch<Content>> {
+  async getBatch(): Promise<Batch<Post>> {
     const batch = this.buff.splice(0, 10);
     return { data: batch, done: this.buff.length === 0 };
   }
@@ -239,28 +241,28 @@ export function searchRemoteCommunity(q: string): Batcher<Community> {
 }
 
 /** get and store content from the given reddit listing */
-export function listingContent(listing: string): Batcher<Content> {
-  return new RemoteBatch<Content>(
+export function listingContent(listing: string): Batcher<Post> {
+  return new RemoteBatch<Post>(
     (p: RedditPosition) => getListing(listing, p),
-    toMediaContent,
+    toMedia,
     10,
     listing
   );
 }
 
 /** get and store content from the given reddit listing */
-export function searchContent(q: Query): Batcher<Content> {
-  return new RemoteBatch<Content>(
+export function searchContent(q: Query): Batcher<Post> {
+  return new RemoteBatch<Post>(
     (p: RedditPosition) => search(q, p),
-    toMediaContent,
+    toPost,
     10,
     q.q ?? ""
   );
 }
 
 /** if the give data is an video or a image response converts it to Content */
-function toMediaContent(data: JsonRes): Content | undefined {
-  const rst = {
+function toPost(data: JsonRes): Post | undefined {
+  const rst: Post = {
     id: data.id,
     title: data.title,
     author: data.author,
@@ -269,9 +271,13 @@ function toMediaContent(data: JsonRes): Content | undefined {
     subreddit: data.subreddit,
     voteRatio: data.upvote_ratio,
     link: "https://www.reddit.com" + data.permalink,
+    isSelf: data.is_self && Boolean(data.selftext),
   };
 
-  if (data.is_video) {
+  if (rst.isSelf) {
+    rst.selfText = data.selftext;
+    return rst;
+  } else if (data.is_video) {
     return {
       ...rst,
       video: {
@@ -285,15 +291,22 @@ function toMediaContent(data: JsonRes): Content | undefined {
             (img: any) => img.width < 640 // a low resolution for a poster should be decent enough
           )?.url ?? "",
       },
-    } as Content;
+    };
   } else if (
     data.preview?.enabled &&
     data.preview?.images[0]?.resolutions?.length > 0
   ) {
-    return { ...rst, images: data.preview.images[0].resolutions } as Content;
+    return { ...rst, images: data.preview.images[0].resolutions };
   }
 
   return;
+}
+
+/** only post with videos or images are returned as Post, textual content is discarded */
+function toMedia(data: JsonRes): Post | undefined {
+  if (!data.is_self) {
+    return toPost(data);
+  }
 }
 
 function toUser(data: JsonRes): User | undefined {

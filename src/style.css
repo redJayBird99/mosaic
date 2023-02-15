@@ -181,3 +181,13 @@ dialog {
     opacity: 1;
   }
 }
+
+.post-content-radius {
+  border-radius: 0 5px 5px 0;
+}
+
+@media (max-width: 450px) {
+  .post-content-radius {
+    border-radius: 0 0 5px 5px;
+  }
+}

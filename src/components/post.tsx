@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Content, Media, MediaVideo } from "../reddit/reddit";
+import { Post, Media, MediaVideo } from "../reddit/reddit";
 import { Flag, Save, Share, UpArrow } from "./icons";
 import { IconBtnGlowStyle } from "./styles/button.style";
 import {
@@ -10,7 +10,6 @@ import {
   LeftBarStyle,
   NotFoundStyle,
   PostAnchorStyle,
-  PostContentStyle,
   PostCtnrInfoStyle,
   PostStyle,
   PostTitleStyle,
@@ -19,23 +18,18 @@ import {
 } from "./styles/post.style";
 import { timeSince } from "../util/util";
 import mGlass from "../asset/magnifying-glass.png";
-import {
-  addToHistory,
-  deleteFromHistory,
-  getHistory,
-  UserHistory,
-} from "../util/history";
+import { addToHistory, deleteFromHistory, getHistory } from "../util/history";
 import { getShaka } from "../shaka-player";
 import blankVideo from "../asset/blank.mp4";
 
 /** container for a listing reddit post, render the post content, infos and user post controls */
-export function Post({ c }: { c: Content }) {
+export function Post({ c }: { c: Post }) {
   const d = new Date(c.created);
 
   return (
     <PostStyle className="post">
       <PostLeftSide c={c} />
-      <PostContentStyle>
+      <div className="post-content-radius flex flex-col flex-grow gap-1 overflow-hidden pt-1">
         <PostAnchorStyle href={c.link} target="_blank">
           <PostCtnrInfoStyle>
             <span className="small-tx">by</span> <strong>{c.author}</strong>
@@ -49,9 +43,21 @@ export function Post({ c }: { c: Content }) {
         <PostAnchorStyle href={c.link} target="_blank">
           <PostTitleStyle>{c.title}</PostTitleStyle>
         </PostAnchorStyle>
-        <PostMediaContent video={c.video} images={c.images} />
-      </PostContentStyle>
+        {c.isSelf ? (
+          <PostSelfText text={c.selfText ?? ""} />
+        ) : (
+          <PostMediaContent video={c.video} images={c.images} />
+        )}
+      </div>
     </PostStyle>
+  );
+}
+
+function PostSelfText(props: { text: string }) {
+  return (
+    <div className="px-2 pb-1 text-sm text-onBg-600">
+      <p>{props.text}</p>
+    </div>
   );
 }
 
@@ -165,7 +171,7 @@ function getScrSet(images: Media[]) {
   return images.map((img) => `${img.url} ${img.width}w`).join(", ");
 }
 
-function PostLeftSide({ c }: { c: Content }) {
+function PostLeftSide({ c }: { c: Post }) {
   const sc = c.score > 1000 ? `${Math.round(c.score / 1000)}k` : c.score;
   const arrow = c.score > 0 ? <UpArrow /> : "ᐁ ";
   return (
@@ -186,7 +192,7 @@ function PostLeftSide({ c }: { c: Content }) {
 
 function useControlStatus(
   k: "saved" | "flagged",
-  c: Content
+  c: Post
 ): [boolean, () => void] {
   const h = getHistory();
   const [active, setStatus] = useState<boolean>(h[k].has(c.id));
@@ -200,7 +206,7 @@ function useControlStatus(
   ];
 }
 
-function PostControls({ c }: { c: Content }) {
+function PostControls({ c }: { c: Post }) {
   const [saved, toggleSaved] = useControlStatus("saved", c);
   const [flagged, toggleFlagged] = useControlStatus("flagged", c);
 

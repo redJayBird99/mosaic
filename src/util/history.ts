@@ -1,4 +1,4 @@
-import { Content } from "../reddit/reddit";
+import { Post } from "../reddit/reddit";
 import { getLoggedIn } from "./account";
 
 const GUEST_KEY = "tmp";
@@ -40,7 +40,7 @@ function updateHistory(update: (h: UserHistory) => void) {
   );
 }
 
-export function addToHistory(k: keyof UserHistory, c: Content): void {
+export function addToHistory(k: keyof UserHistory, c: Post): void {
   updateHistory((history) => {
     if (k === "saved" || k === "flagged") {
       history[k].add(c.id);
@@ -52,7 +52,7 @@ export function addToHistory(k: keyof UserHistory, c: Content): void {
   });
 }
 
-export function deleteFromHistory(k: keyof UserHistory, c: Content): void {
+export function deleteFromHistory(k: keyof UserHistory, c: Post): void {
   updateHistory((history) => {
     if (k === "saved" || k === "flagged") {
       history[k].delete(c.id);
@@ -64,24 +64,24 @@ export function deleteFromHistory(k: keyof UserHistory, c: Content): void {
   });
 }
 
-export function getSavedContent(): Content[] {
+export function getSavedContent(): Post[] {
   return JSON.parse(
     localStorage.getItem(savedContentKey(getLoggedIn()?.key)) ?? "[]"
   );
 }
 
-function updateSavedContent(update: (c: Content[]) => void, user?: string) {
+function updateSavedContent(update: (c: Post[]) => void, user?: string) {
   const saved = getSavedContent();
   update(saved);
   localStorage.setItem(savedContentKey(user), JSON.stringify(saved));
 }
 
 /** add to the saves without checking for duplication */
-function addToSavedContent(c: Content, user?: string) {
+function addToSavedContent(c: Post, user?: string) {
   updateSavedContent((cs) => cs.push(c), user);
 }
 
-function deleteFromSavedContent(c: Content, user?: string) {
+function deleteFromSavedContent(c: Post, user?: string) {
   updateSavedContent((saved) => {
     const i = saved.findIndex((save) => save.id === c.id);
 

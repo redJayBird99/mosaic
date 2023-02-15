@@ -14,21 +14,6 @@ export const PostStyle = styled.section`
   }
 `;
 
-export const PostContentStyle = styled.div`
-  border-radius: 0 5px 5px 0;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  gap: 3px;
-  justify-content: space-between;
-  overflow: hidden;
-  padding: 4px 0 0 0;
-
-  @media (max-width: ${SMALL_SCREEN}px) {
-    border-radius: 0 0 5px 5px;
-  }
-`;
-
 export const PostAnchorStyle = styled.a`
   color: var(--on-bg-color);
   text-decoration: none;

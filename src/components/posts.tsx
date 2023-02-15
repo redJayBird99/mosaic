@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef } from "react";
-import { Content, Batcher } from "../reddit/reddit";
+import { Post as Content, Batcher } from "../reddit/reddit";
 import { NotFound, Post } from "./post";
 import { SkeletonPost } from "./skeleton-post";
 import {
